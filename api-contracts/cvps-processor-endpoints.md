@@ -3,9 +3,6 @@
 Version: 2.0  
 Last Updated: 2025-08-02
 
-## ⚠️ IMPORTANT: Actual Implementation Status
-
-This document reflects the **ACTUAL WORKING ENDPOINTS** as of 2025-08-02. Individual item endpoints (`/product/{id}`, `/category/{slug}`, `/blog/{slug}`) are **NOT IMPLEMENTED** and return 405 errors. Use list endpoints with filtering instead.
 
 ## Overview
 
@@ -38,7 +35,7 @@ X-Site-ID: {site_id}
 
 ⚠️ **ALL endpoints are GET-only**. POST requests will return 405 Method Not Allowed.
 
-## Working Endpoints (Verified 2025-08-02)
+## Endpoints
 
 ### 1. Homepage Content ✅
 
@@ -358,13 +355,13 @@ Returns service status. **Requires authentication** (unlike standard health chec
 }
 ```
 
-## NOT IMPLEMENTED Endpoints ❌
+## Query Strategies for Individual Items
 
-The following endpoints were planned but are **NOT IMPLEMENTED**. They return 405 Method Not Allowed:
+To retrieve specific items, use list endpoints with filters:
 
-1. **GET** `/api/cvps/product/{id}` - Use `/api/cvps/products?search=` instead
-2. **GET** `/api/cvps/category/{slug}` - Use `/api/cvps/products?category={slug}` instead
-3. **GET** `/api/cvps/blog/{slug}` - Use `/api/cvps/blog` and filter client-side
+1. **For specific product**: Use `/api/cvps/products?search={name}`
+2. **For category products**: Use `/api/cvps/products?category={slug}`
+3. **For specific blog post**: Use `/api/cvps/blog` and filter by slug client-side
 
 ## Error Responses
 
@@ -407,10 +404,9 @@ curl -X GET "http://localhost:5050/api/cvps/homepage" \
   -H "X-API-Key: cvps-dev-key-2025"
 ```
 
-## Migration Notes
+## Frontend Implementation Notes
 
-Frontend applications should:
-1. Remove calls to non-existent endpoints (`/product/{id}`, `/category/{slug}`, `/blog/{slug}`)
+1. All endpoints are GET-only
 2. Use list endpoints with filtering for individual items
 3. Handle relative media URLs by prepending appropriate base URL
-4. Expect all endpoints to be GET-only
+4. Include authentication headers on all requests

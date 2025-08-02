@@ -1,66 +1,90 @@
-# L36 Platform API Contract - DEPRECATED
-## ⚠️ THIS DOCUMENT IS DEPRECATED - See cvps-processor-endpoints.md
+# L36 Platform API Contract
+## Version 2.0 - CVPS Processor Standard
 
-**IMPORTANT:** This document contains legacy endpoint patterns that are being phased out. 
+This document defines the API contract between the L36 Customer Frontend and the L36 Management System Backend.
 
-For the current API specification, please refer to:
-- **[cvps-processor-endpoints.md](./cvps-processor-endpoints.md)** - Current CVPS Processor API v2.0
-
----
-
-## Migration Status
-
-As of 2025-08-02, the platform has migrated to the CVPS Processor pattern:
-
-### ✅ Active System (CVPS Processor)
-- 8 consolidated endpoints at `/api/cvps/*`
-- GET-only operations
-- Optimized for single API calls per page
-- See [cvps-processor-endpoints.md](./cvps-processor-endpoints.md)
-
-### ❌ Legacy System (Being Deprecated)
-- Multiple granular endpoints (`/api/content/*`, `/api/data/*`, `/api/products/*`)
-- Mixed GET/POST operations
-- Required multiple API calls per page
-- Still partially functional but not recommended
+For complete endpoint specifications, see [cvps-processor-endpoints.md](./cvps-processor-endpoints.md)
 
 ---
 
-## Authentication Changes
+## Authentication
 
-### Current (CVPS Processor):
+All API requests require authentication headers:
+
 ```http
 X-API-Key: cvps-dev-key-2025
 X-Site-ID: dev.latitude36.com.au
 ```
 
-### Legacy (Deprecated):
+Production:
 ```http
-X-API-Key: {old-api-key}
-X-Site-ID: latitude36
+X-API-Key: cvps-prod-key-2025
+X-Site-ID: latitude36.com.au
 ```
 
 ---
 
-## Endpoint Migration Guide
+## Base URLs
 
-| Legacy Endpoint | CVPS Processor Replacement | Notes |
-|----------------|---------------------------|-------|
-| `/api/content/homepage` | `/api/cvps/homepage` | Consolidated response |
-| `/api/data/products` | `/api/cvps/products` | Includes pagination |
-| `/api/data/categories` | `/api/cvps/categories` | Hierarchical structure |
-| `/api/data/blog/posts` | `/api/cvps/blog` | Includes media |
-| `/api/content/product/{id}` | **NOT IMPLEMENTED** | Use `/api/cvps/products?search=` |
-| `/api/content/category/{id}` | **NOT IMPLEMENTED** | Use `/api/cvps/products?category=` |
-| `/api/content/blog/{id}` | **NOT IMPLEMENTED** | Use `/api/cvps/blog` and filter |
+- **Local Development**: `http://localhost:5050/api/cvps`
+- **Development**: `https://api.dev.latitude36.com.au/api/cvps`
+- **Production**: `https://l36.com.au/api/cvps`
 
 ---
 
-## Important Notes
+## Available Endpoints
 
-1. **Frontend teams** should migrate to CVPS Processor endpoints immediately
-2. **Legacy endpoints** may be removed without notice
-3. **Individual item endpoints** (`/product/{id}`, `/category/{slug}`, `/blog/{slug}`) do not exist in CVPS Processor
-4. All new development must use CVPS Processor pattern
+All endpoints are GET-only and follow the CVPS Processor pattern:
 
-For the complete, current API specification, see [cvps-processor-endpoints.md](./cvps-processor-endpoints.md)
+1. `/api/cvps/homepage` - Homepage content
+2. `/api/cvps/products` - Product catalog with search/filter
+3. `/api/cvps/blog` - Blog posts
+4. `/api/cvps/categories` - Category hierarchy
+5. `/api/cvps/newsletter` - Newsletter configuration
+6. `/api/cvps/galleries` - Gallery list
+7. `/api/cvps/galleries/{slug}` - Single gallery
+8. `/api/cvps/health` - Service health check
+
+---
+
+## Response Format
+
+All responses follow this structure:
+
+```json
+{
+  "success": true,
+  "data": { /* endpoint specific data */ },
+  "cached_at": "2025-08-02T22:38:26.916997",
+  "version": "1.0"
+}
+```
+
+Error responses:
+```json
+{
+  "error": "string",
+  "message": "string",
+  "code": 401
+}
+```
+
+---
+
+## Media URLs
+
+All media URLs are relative paths (`/media/...`). Frontend constructs full URLs:
+- Development: `https://api.dev.latitude36.com.au/media/...`
+- Production: `https://l36.com.au/media/...`
+
+---
+
+## Implementation Guide
+
+For complete specifications including:
+- Request/response examples
+- Query parameters
+- Data structures
+- TypeScript types
+
+See [cvps-processor-endpoints.md](./cvps-processor-endpoints.md)
