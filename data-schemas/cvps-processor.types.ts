@@ -1,34 +1,18 @@
 /**
  * CVPS Processor TypeScript Type Definitions
- * Version: 1.0
- * Last Updated: 2025-07-31
+ * 
+ * Version: 3.1 - Enhanced with Product Tagging System
+ * Last Updated: 2025-01-22
+ * 
+ * These types define the complete API contract between MVPS CVPS Processor
+ * and the CVPS frontend at dev.latitude36.com.au
  */
 
-// Common Types
-export interface MediaItem {
-  url: string;
-  alt: string;
-}
+// ===== COMMON TYPES =====
 
-export interface VideoItem extends MediaItem {
-  title: string;
-  provider?: 'youtube' | 'vimeo' | 'direct';
-  poster?: string;
-  thumbnail?: string;
-  duration?: number;
-}
-
-export interface CTAButton {
-  text: string;
-  link: string;
-}
-
-export interface SEOMetadata {
-  title: string;
-  description: string;
-  ogTitle?: string;
-  ogDescription?: string;
-  keywords?: string[];
+export interface BaseResponse {
+  success: boolean;
+  cached_at: string;
 }
 
 export interface PaginationInfo {
@@ -38,29 +22,150 @@ export interface PaginationInfo {
   total_pages: number;
 }
 
-export interface CacheInfo {
-  cached_at: string;
-  version?: string;
+export interface MediaImage {
+  url: string;  // Relative path starting with /media/
+  alt: string;
 }
 
-// Authentication
-export interface CVPSAuthHeaders {
-  'X-API-Key': string;
-  'X-Site-ID': string;
+export interface MediaVideo {
+  url: string;  // Relative path starting with /media/
+  poster?: string;
+  autoplay?: boolean;
 }
 
-// Homepage Types
-export interface HomepageHero {
+export interface ProductImages {
+  main: MediaImage | null;
+  thumbnails: MediaImage[];
+}
+
+export interface ProductVideos {
+  id: string;
+  url: string;
+  title: string;
+  duration?: number;
+  provider: 'direct' | 'youtube' | 'vimeo';
+  thumbnail?: string;
+  poster?: string;
+  variants?: {
+    optimized?: {
+      url: string;
+      platform: string;
+      resolution?: string;
+    };
+  };
+  streamingUrls?: {
+    hls?: string;
+    dash?: string;
+  };
+}
+
+export interface Price {
+  website: number | null;
+  wholesale: number | null;
+}
+
+// ===== TAGGING SYSTEM TYPES =====
+
+export interface TagCategory {
+  name: string;
+  description: string;
+  color: string;  // Hex color code
+  tags: string[];
+}
+
+export interface ProductTagMetadata {
+  [categoryName: string]: string[];
+}
+
+export interface FilterOptions {
+  tags: string[];
+  tag_categories: TagCategory[];
+  price_range: {
+    min: number;
+    max: number;
+    average: number;
+  };
+}
+
+export interface SearchParams {
+  q?: string;
+  tags: string[];
+  categories: string[];
+  priceRange: {
+    min?: number;
+    max?: number;
+  };
+  sortBy?: 'name' | 'price' | 'created' | 'popularity';
+  sortOrder?: 'asc' | 'desc';
+}
+
+// ===== PRODUCT TYPES =====
+
+export interface ProductCategory {
+  id: number;
+  name: string;
+  slug: string;
+  is_primary?: boolean;
+}
+
+export interface ProductSummary {
+  id: number;
+  name: string;
+  slug: string;
+  shortDescription: string;
+  longDescription?: string;
+  price: Price;
+  category: {
+    name: string;
+    slug: string;
+  };
+  images: ProductImages;
+  videos: ProductVideos[];
+  isActive: boolean;
+  // Enhanced tagging fields
+  tags: string[];
+  searchTerms: string[];
+  tagCategories: ProductTagMetadata;
+}
+
+export interface ProductDetail extends ProductSummary {
+  number: string;
+  categories: ProductCategory[];
+  primaryCategory: ProductCategory | null;
+}
+
+export interface ProductsResponse extends BaseResponse {
+  products: ProductSummary[];
+  pagination: PaginationInfo;
+  filters?: FilterOptions;
+}
+
+export interface ProductSearchResponse extends BaseResponse {
+  products: ProductSummary[];
+  pagination: PaginationInfo;
+  filters: FilterOptions;
+  searchParams: SearchParams;
+}
+
+export interface SingleProductResponse extends BaseResponse {
+  product: ProductDetail;
+}
+
+// ===== HOMEPAGE TYPES =====
+
+export interface HeroSection {
   title: string;
   subtitle: string;
-  backgroundImage: MediaItem;
-  backgroundVideo?: VideoItem;
-  primaryCTA: CTAButton;
-  secondaryCTA: CTAButton;
-}
-
-export interface TextSlider {
-  text: string;
+  backgroundImage: MediaImage;
+  backgroundVideo?: MediaVideo;
+  primaryCTA: {
+    text: string;
+    link: string;
+  };
+  secondaryCTA: {
+    text: string;
+    link: string;
+  };
 }
 
 export interface WelcomeBanner {
@@ -68,16 +173,20 @@ export interface WelcomeBanner {
   subtitle: string;
   tagline: string;
   description: string;
-  primaryCTA: CTAButton;
-  secondaryCTA: CTAButton;
+  primaryCTA: {
+    text: string;
+    link: string;
+  };
+  secondaryCTA: {
+    text: string;
+    link: string;
+  };
 }
 
 export interface FeatureItem {
-  id: string;
   title: string;
   description: string;
   icon: string;
-  link: string;
 }
 
 export interface Features {
@@ -86,328 +195,457 @@ export interface Features {
   items: FeatureItem[];
 }
 
-export interface Section {
+export interface TestimonialItem {
+  text: string;
+  author: string;
+  role: string;
+  location: string;
+}
+
+export interface Testimonials {
+  title: string;
+  subtitle: string;
+  items: TestimonialItem[];
+}
+
+export interface CategoryGrid {
   title: string;
   subtitle: string;
 }
 
-export interface TestimonialItem {
-  id: string;
-  author: string;
-  role: string;
-  content: string;
-  rating: number;
-  image: MediaItem;
+export interface FeaturedProducts {
+  title: string;
+  subtitle: string;
 }
 
-export interface Testimonials extends Section {
-  items: TestimonialItem[];
+export interface BlogSection {
+  title: string;
+  subtitle: string;
+}
+
+export interface PressSection {
+  title: string;
+}
+
+export interface SEOData {
+  title: string;
+  description: string;
+  ogTitle: string;
+  ogDescription: string;
 }
 
 export interface HomepageData {
-  hero: HomepageHero;
-  textSlider: TextSlider;
+  hero: HeroSection;
+  textSlider: {
+    text: string;
+  };
   welcomeBanner: WelcomeBanner;
   features: Features;
-  categoryGrid: Section;
-  featuredProducts: Section;
   testimonials: Testimonials;
-  blogSection: Section;
-  pressSection: Pick<Section, 'title'>;
-  seo: SEOMetadata;
+  categoryGrid: CategoryGrid;
+  featuredProducts: FeaturedProducts;
+  blogSection: BlogSection;
+  pressSection: PressSection;
+  seo: SEOData;
 }
 
-export interface HomepageResponse extends CacheInfo {
-  success: boolean;
+export interface HomepageResponse extends BaseResponse {
   data: HomepageData;
+  version: string;
 }
 
-// Product Types
-export interface ProductCategory {
-  id: number;
-  name: string;
-  slug: string;
-}
+// ===== BLOG TYPES =====
 
-export interface ProductImage extends MediaItem {
-  id: number;
-  is_primary: boolean;
-}
-
-export interface ProductVideo extends VideoItem {
-  id: number;
-}
-
-export interface ProductSize {
-  size: string;
-  price: number;
-  weight: string;
-}
-
-export interface Recipe {
-  id: number;
-  name: string;
-  percentage: number;
-}
-
-export interface RecipeGroup {
-  id: number;
-  name: string;
-  serving_size: string;
-  recipes: Recipe[];
-}
-
-export interface NutritionalInfo {
-  energy: string;
-  protein: string;
-  fat_total: string;
-  carbohydrates: string;
-  [key: string]: string; // Allow additional nutritional fields
-}
-
-export interface Product {
-  id: number;
-  sku: string;
-  name: string;
-  description: string;
-  price: number;
-  weight: string;
-  gross_weight: string;
-  category: ProductCategory;
-  images: ProductImage[];
-  videos: ProductVideo[];
-  sizes: ProductSize[];
-  recipe_groups: RecipeGroup[];
-  nutritional_info: NutritionalInfo;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ProductsResponse extends CacheInfo {
-  success: boolean;
-  products: Product[];
-  pagination: PaginationInfo;
-}
-
-export interface ProductQueryParams {
-  page?: number;
-  per_page?: number;
-  category?: string;
-  search?: string;
-}
-
-// Blog Types
-export interface BlogAuthor {
-  name: string;
-  bio: string;
-  avatar: MediaItem;
-}
-
-export interface BlogCategory {
-  id: number;
-  name: string;
-  slug: string;
-}
-
-// Blog content blocks for structured content
-export interface TextBlock {
-  type: 'text';
-  content: string;
-}
-
-export interface HeadingBlock {
-  type: 'heading';
-  level: 1 | 2 | 3 | 4 | 5 | 6;
-  content: string;
-}
-
-export interface ImageBlock {
-  type: 'image';
-  url: string;
-  alt: string;
-  caption?: string;
-}
-
-export interface VideoBlock {
-  type: 'video';
-  url: string;
-  title: string;
-  provider?: 'youtube' | 'vimeo' | 'direct';
-  aspectRatio?: string;
-  autoplay?: boolean;
-  controls?: boolean;
-  muted?: boolean;
-  loop?: boolean;
-}
-
-export type BlogContentBlock = TextBlock | HeadingBlock | ImageBlock | VideoBlock;
-
-export interface BlogPost {
+export interface BlogSummary {
   id: number;
   title: string;
   slug: string;
   excerpt: string;
-  content: string | BlogContentBlock[]; // Can be HTML string or block array
-  author: BlogAuthor;
-  featured_image: MediaItem;
-  categories: BlogCategory[];
+  featuredImage: MediaImage;
+  publishedAt: string;
+  author: string;
+  category: string;
   tags: string[];
-  seo: SEOMetadata;
-  published_at: string;
-  created_at: string;
-  updated_at: string;
+  readTime: string;
 }
 
-export interface BlogResponse extends CacheInfo {
-  success: boolean;
-  posts: BlogPost[];
+export interface BlogDetail extends BlogSummary {
+  content: any;  // Rich content object
+  updatedAt: string;
+  galleries: Array<{ id: number }>;
+  seo: {
+    title: string;
+    description: string;
+    keywords: string[];
+  };
+}
+
+export interface BlogResponse extends BaseResponse {
+  posts: BlogSummary[];
   total: number;
 }
 
-export interface BlogQueryParams {
-  limit?: number;
+export interface SingleBlogResponse extends BaseResponse {
+  post: BlogDetail;
 }
 
-// Category Types
-export interface CategoryNode {
+// ===== CATEGORY TYPES =====
+
+export interface CategorySummary {
   id: number;
   name: string;
   slug: string;
-  description?: string;
-  parent_id: number | null;
-  image?: MediaItem;
-  product_count: number;
-  children: CategoryNode[];
+  level: number;
+  productCount: number;
+  children: CategorySummary[];
 }
 
-export interface CategoriesResponse extends CacheInfo {
-  success: boolean;
-  categories: CategoryNode[];
+export interface CategoryDetail {
+  id: number;
+  name: string;
+  slug: string;
+  parentId: number | null;
+  level: number;
+  description: string;
+  image: string | null;
+  subcategories: Array<{
+    id: number;
+    name: string;
+    slug: string;
+    product_count: number;
+  }>;
 }
 
-// Newsletter Types
-export interface NewsletterFormFields {
-  emailPlaceholder: string;
-  buttonText: string;
-  successMessage: string;
-  errorMessage: string;
+export interface CategoryProduct {
+  id: number;
+  name: string;
+  slug: string;
+  number: string;
+  shortDescription: string;
+  price: number | null;
+  mainImage: string | null;
+  thumbnail: string | null;
+  isActive: boolean;
+  // Include tags for category products
+  tags: string[];
+  searchTerms: string[];
+}
+
+export interface CategoriesResponse extends BaseResponse {
+  categories: CategorySummary[];
+}
+
+export interface SingleCategoryResponse extends BaseResponse {
+  category: CategoryDetail;
+  products: CategoryProduct[];
+  total: number;
+}
+
+// ===== NEWSLETTER TYPES =====
+
+export interface NewsletterSettings {
+  enabled: boolean;
+  doubleOptIn: boolean;
+  confirmationRequired: boolean;
 }
 
 export interface NewsletterContent {
   title: string;
-  subtitle: string;
   description: string;
-  benefits: string[];
-  formFields: NewsletterFormFields;
-  privacyText?: string;
-  privacyLink?: string;
+  placeholder: string;
+  buttonText: string;
+  privacyText: string;
+  settings: NewsletterSettings;
 }
 
-export interface NewsletterResponse extends CacheInfo {
-  success: boolean;
+export interface NewsletterResponse extends BaseResponse {
   content: NewsletterContent;
 }
 
-// Gallery Types
-export interface GalleryImage extends MediaItem {
+// ===== GALLERY TYPES =====
+
+export interface GalleryImage {
   id: number;
-  caption?: string;
+  url: string;  // Relative path starting with /media/
+  alt: string;
+  caption: string;
   order: number;
-  metadata?: {
+  dimensions?: {
     width: number;
     height: number;
-    size: number;
-    format: string;
   };
+  fileType?: string;
+  size?: number;  // File size in bytes
+  aspectRatio?: number;
 }
 
-export interface Gallery {
+export interface GallerySummary {
   id: number;
   title: string;
   slug: string;
   description: string;
-  cover_image: MediaItem;
+  imageCount: number;
   images: GalleryImage[];
-  total_images: number;
-  tags?: string[];
-  created_at: string;
-  updated_at: string;
 }
 
-export interface GalleriesResponse extends CacheInfo {
-  success: boolean;
-  galleries: Gallery[];
+export interface GalleryDetail extends GallerySummary {
+  layout: string;
+  columns: number;
+  showCaptions: boolean;
+  spacing: string;
+  publishedAt: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  seo: {
+    metaDescription: string;
+    keywords: string[];
+  };
+}
+
+export interface GalleriesResponse extends BaseResponse {
+  galleries: GallerySummary[];
   total: number;
 }
 
-export interface GalleryResponse extends CacheInfo {
-  success: boolean;
-  gallery: Gallery;
+export interface SingleGalleryResponse extends BaseResponse {
+  gallery: GalleryDetail;
 }
 
-export interface GalleryQueryParams {
-  limit?: number;
+// ===== HEALTH CHECK TYPES =====
+
+export interface CacheStats {
+  enabled: boolean;
+  type: string;
+  hit_rate?: number;
+  memory_usage?: number;
 }
 
-// Error Response
+export interface HealthResponse {
+  status: 'healthy' | 'unhealthy';
+  service: 'cvps_processor';
+  database: 'connected' | 'disconnected';
+  cache: CacheStats;
+  version: string;
+  endpoints_available: number;
+  features: string[];
+  timestamp: string;
+}
+
+// ===== ERROR TYPES =====
+
 export interface ErrorResponse {
   error: string;
   message: string;
   code: number;
-  details?: Record<string, any>;
+  details?: any;
+  service?: string;
 }
 
-// Health Check
-export interface HealthCheckResponse {
-  status: 'healthy' | 'unhealthy';
-  service: string;
-  database: string;
-  cache: {
-    enabled: boolean;
-    type?: string;
+export interface ValidationErrorResponse extends ErrorResponse {
+  details: {
+    [field: string]: string[];
   };
-  version: string;
-  timestamp: string;
 }
 
-// Rate Limit Headers
-export interface RateLimitHeaders {
-  'X-RateLimit-Limit': string;
-  'X-RateLimit-Remaining': string;
-  'X-RateLimit-Reset': string;
-}
+// ===== API CLIENT INTERFACES =====
 
-// Cache Headers
-export interface CacheHeaders {
-  'Cache-Control': string;
-  'ETag': string;
-  'X-Cache-Status': 'HIT' | 'MISS';
-  'X-Cache-TTL': string;
-  'Expires': string;
-}
-
-// API Client Interface
-export interface CVPSApiClient {
+export interface CVPSProcessorClient {
   // Homepage
   getHomepage(): Promise<HomepageResponse>;
   
   // Products
-  getProducts(params?: ProductQueryParams): Promise<ProductsResponse>;
+  getProducts(params?: {
+    page?: number;
+    per_page?: number;
+    category?: string;
+    search?: string;
+  }): Promise<ProductsResponse>;
+  
+  searchProducts(params: {
+    q?: string;
+    search?: string;
+    tags?: string[];
+    categories?: string[];
+    price_min?: number;
+    price_max?: number;
+    page?: number;
+    per_page?: number;
+    sort_by?: 'name' | 'price' | 'created' | 'popularity';
+    sort_order?: 'asc' | 'desc';
+  }): Promise<ProductSearchResponse>;
+  
+  getProductById(id: number): Promise<SingleProductResponse>;
+  getProductBySlug(slug: string): Promise<SingleProductResponse>;
   
   // Blog
-  getBlogPosts(params?: BlogQueryParams): Promise<BlogResponse>;
+  getBlogPosts(params?: { limit?: number }): Promise<BlogResponse>;
+  getBlogPostById(id: number): Promise<SingleBlogResponse>;
+  getBlogPostBySlug(slug: string): Promise<SingleBlogResponse>;
   
   // Categories
   getCategories(): Promise<CategoriesResponse>;
+  getCategoryById(id: number): Promise<SingleCategoryResponse>;
+  getCategoryBySlug(slug: string): Promise<SingleCategoryResponse>;
   
   // Newsletter
-  getNewsletterConfig(): Promise<NewsletterResponse>;
+  getNewsletterContent(): Promise<NewsletterResponse>;
   
   // Galleries
-  getGalleries(params?: GalleryQueryParams): Promise<GalleriesResponse>;
-  getGalleryBySlug(slug: string): Promise<GalleryResponse>;
+  getGalleries(params?: { limit?: number }): Promise<GalleriesResponse>;
+  getGalleryBySlug(slug: string): Promise<SingleGalleryResponse>;
   
   // Health
-  checkHealth(): Promise<HealthCheckResponse>;
+  getHealth(): Promise<HealthResponse>;
 }
+
+// ===== FRONTEND HOOK TYPES =====
+
+export interface UseProductSearchOptions {
+  initialQuery?: string;
+  initialTags?: string[];
+  initialCategories?: string[];
+  initialPriceRange?: { min?: number; max?: number };
+  autoSearch?: boolean;
+}
+
+export interface UseProductSearchReturn {
+  // State
+  products: ProductSummary[];
+  loading: boolean;
+  error: string | null;
+  pagination: PaginationInfo;
+  filters: FilterOptions;
+  searchParams: SearchParams;
+  
+  // Actions
+  search: (query: string) => void;
+  setTags: (tags: string[]) => void;
+  setCategories: (categories: string[]) => void;
+  setPriceRange: (range: { min?: number; max?: number }) => void;
+  setSorting: (sortBy: string, sortOrder: string) => void;
+  setPage: (page: number) => void;
+  clearFilters: () => void;
+  
+  // Computed
+  hasFilters: boolean;
+  resultCount: number;
+}
+
+export interface UseProductTagsReturn {
+  // Available tags organized by category
+  tagCategories: TagCategory[];
+  allTags: string[];
+  
+  // Selected tags
+  selectedTags: string[];
+  setSelectedTags: (tags: string[]) => void;
+  toggleTag: (tag: string) => void;
+  
+  // Tag utilities
+  getTagsInCategory: (categoryName: string) => string[];
+  getTagCategory: (tag: string) => TagCategory | null;
+  clearTags: () => void;
+}
+
+// ===== COMPONENT PROP TYPES =====
+
+export interface ProductCardProps {
+  product: ProductSummary;
+  onClick?: (product: ProductSummary) => void;
+  showTags?: boolean;
+  showPrice?: boolean;
+  showCategory?: boolean;
+}
+
+export interface ProductFilterProps {
+  filters: FilterOptions;
+  searchParams: SearchParams;
+  onSearchChange: (query: string) => void;
+  onTagsChange: (tags: string[]) => void;
+  onCategoriesChange: (categories: string[]) => void;
+  onPriceRangeChange: (range: { min?: number; max?: number }) => void;
+  onSortChange: (sortBy: string, sortOrder: string) => void;
+  onClearFilters: () => void;
+}
+
+export interface TagSelectorProps {
+  tagCategories: TagCategory[];
+  selectedTags: string[];
+  onTagsChange: (tags: string[]) => void;
+  maxTags?: number;
+  showCategories?: boolean;
+}
+
+export interface PriceRangeFilterProps {
+  priceRange: { min: number; max: number; average: number };
+  selectedRange: { min?: number; max?: number };
+  onRangeChange: (range: { min?: number; max?: number }) => void;
+}
+
+// ===== UTILITY TYPES =====
+
+export type SortField = 'name' | 'price' | 'created' | 'popularity';
+export type SortOrder = 'asc' | 'desc';
+
+export interface SearchFilters {
+  query?: string;
+  tags: string[];
+  categories: string[];
+  priceRange: { min?: number; max?: number };
+  sortBy: SortField;
+  sortOrder: SortOrder;
+}
+
+// ===== CACHE TYPES =====
+
+export interface CacheKey {
+  endpoint: string;
+  params: Record<string, any>;
+}
+
+export interface CachedResponse<T> {
+  data: T;
+  cachedAt: number;
+  expiresAt: number;
+}
+
+// ===== ENVIRONMENT CONFIGURATION =====
+
+export interface CVPSEnvironmentConfig {
+  apiBaseUrl: string;
+  mediaBaseUrl: string;
+  apiKey: string;
+  siteId: string;
+  cacheTimeout: number;
+  retryAttempts: number;
+}
+
+export const DEFAULT_CVPS_CONFIG: CVPSEnvironmentConfig = {
+  apiBaseUrl: 'http://localhost:5050/api/cvps',
+  mediaBaseUrl: 'http://localhost:5050',
+  apiKey: 'cvps-dev-key-2025',
+  siteId: 'dev.latitude36.com.au',
+  cacheTimeout: 300000, // 5 minutes
+  retryAttempts: 3
+};
+
+// ===== EXPORT ALL TYPES =====
+
+export * from './cvps-processor.types';
+
+// Version information
+export const CVPS_API_VERSION = '3.1';
+export const SUPPORTED_FEATURES = [
+  'product_tagging',
+  'enhanced_search',
+  'price_filtering',
+  'multi_category_support',
+  'tag_categories',
+  'relative_urls',
+  'cache_headers',
+  'pagination',
+  'sorting'
+] as const;
+
+export type CVPSFeature = typeof SUPPORTED_FEATURES[number];
