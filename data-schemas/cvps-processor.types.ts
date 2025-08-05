@@ -1,7 +1,7 @@
 /**
  * CVPS Processor TypeScript Type Definitions
  * 
- * Version: 3.1 - Enhanced with Product Tagging System
+ * Version: 3.2 - Fixed Price Type Consistency
  * Last Updated: 2025-01-22
  * 
  * These types define the complete API contract between MVPS CVPS Processor
@@ -322,7 +322,7 @@ export interface CategoryProduct {
   slug: string;
   number: string;
   shortDescription: string;
-  price: number | null;
+  price: number | null;  // NOTE: Category products return website price as single number
   mainImage: string | null;
   thumbnail: string | null;
   isActive: boolean;
@@ -635,7 +635,7 @@ export const DEFAULT_CVPS_CONFIG: CVPSEnvironmentConfig = {
 export * from './cvps-processor.types';
 
 // Version information
-export const CVPS_API_VERSION = '3.1';
+export const CVPS_API_VERSION = '3.2';
 export const SUPPORTED_FEATURES = [
   'product_tagging',
   'enhanced_search',
