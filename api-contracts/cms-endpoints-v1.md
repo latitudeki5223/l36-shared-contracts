@@ -2,7 +2,7 @@
 
 ## Overview
 
-Content Management System endpoints for L36 MVPS internal operations. These endpoints handle checkout, order management, customer accounts, wholesale operations, and newsletter management.
+Content Management System endpoints for L36 MVPS internal operations. These endpoints handle checkout, order management, customer accounts, wholesale operations, newsletter management, and product reviews with AI moderation.
 
 **Base URL**: `http://localhost:5050/api/cms`  
 **Version**: 1.0  
@@ -77,6 +77,16 @@ Content Management System endpoints for L36 MVPS internal operations. These endp
 | POST | `/newsletter/subscribe` | Subscribe to newsletter | API Key | `app/cms/customers/accounts.py:190` |
 | GET | `/newsletter/unsubscribe/<token>` | Unsubscribe via token | None | `app/cms/customers/accounts.py:252` |
 
+#### Reviews
+
+| Method | Endpoint | Description | Auth | Implementation |
+|--------|----------|-------------|------|----------------|
+| POST | `/reviews` | Submit product review with AI processing | API Key | `app/cms/customers/reviews.py:170` |
+| POST | `/reviews/<int:id>/reply` | Manual reply to review | Admin | `app/cms/customers/reviews.py:343` |
+| POST | `/reviews/<int:id>/quick-reply` | Generate AI reply suggestion | Admin | `app/cms/customers/reviews.py:460` |
+| PATCH | `/reviews/<int:id>/approve` | Approve pending review | Admin | `app/cms/customers/reviews.py:406` |
+| PATCH | `/reviews/<int:id>/testimonial` | Toggle testimonial status | Admin | `app/cms/customers/reviews.py:435` |
+
 ### 3. Marketing Module (`/api/cms/marketing`)
 
 #### Newsletter Management
@@ -88,6 +98,12 @@ Content Management System endpoints for L36 MVPS internal operations. These endp
 | POST | `/newsletter/manual-subscribe` | Admin manual add | Admin | `app/cms/marketing/newsletter.py:195` |
 | GET | `/newsletter/search` | Search subscribers | Admin | `app/cms/marketing/newsletter.py:270` |
 
+#### Testimonials
+
+| Method | Endpoint | Description | Auth | Implementation |
+|--------|----------|-------------|------|----------------|
+| GET | `/testimonials` | Get featured testimonials for homepage | None | `app/marketing_routes.py:442` |
+
 ### 4. Admin Module (`/api/cms/admin`)
 
 #### Order Administration
@@ -97,6 +113,16 @@ Content Management System endpoints for L36 MVPS internal operations. These endp
 | GET | `/orders` | List all orders with filtering | Admin | `app/cms/admin/orders.py:36` |
 | PATCH | `/orders/<int:id>/status` | Update order status | Admin | `app/cms/admin/orders.py:99` |
 | PATCH | `/orders/<int:id>/tracking` | Add/update tracking number | Admin | `app/cms/admin/orders.py:164` |
+
+## Additional Review Endpoints
+
+These endpoints are outside the CMS module but part of the review system:
+
+### Product Reviews Display
+
+| Method | Endpoint | Description | Auth | Implementation |
+|--------|----------|-------------|------|----------------|
+| GET | `/api/products/<int:id>/reviews` | Get approved reviews for product | None | `app/product_routes.py:3004` |
 
 ## Request/Response Examples
 
