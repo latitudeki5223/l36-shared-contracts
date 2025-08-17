@@ -23,11 +23,16 @@
 /shared-contracts/
 ├── api-contracts/           # API specifications
 │   ├── API_CONTRACT.md     # Main contract (v2.0)
-│   └── cvps-processor-endpoints.md  # CVPS Processor spec
+│   ├── cvps-processor-endpoints.md  # CVPS Processor spec
+│   ├── cms-endpoints-v1.md          # CMS system spec
+│   └── commerce/          # Commerce domain specs
 ├── data-schemas/           # TypeScript types
-│   └── cvps-processor.types.ts
+│   ├── cvps-processor.types.ts
+│   ├── cms-v1.types.ts             # CMS types
+│   └── commerce-v1.types.ts        # Commerce types
 ├── integration-specs/      # Testing & validation
-│   ├── test-cvps-endpoints.sh       # Endpoint test script
+│   ├── test-cvps-endpoints.sh       # CVPS endpoint tests
+│   ├── test-cms-endpoints.sh        # CMS endpoint tests
 │   ├── validate-cvps-coverage.py    # Coverage validation
 │   ├── dev-context-sync.md          # System state
 │   └── DEV_CONTEXT_MAINTENANCE_GUIDE.md  # Maintenance guide
@@ -43,4 +48,4 @@
 
 ---
 
-*Last Updated: 2025-08-03*
+*Last Updated: 2025-08-17*
