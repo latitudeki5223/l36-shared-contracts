@@ -6,7 +6,8 @@ Content Management System endpoints for L36 MVPS internal operations. These endp
 
 **Base URL**: `http://localhost:5050/api/cms`  
 **Version**: 1.0  
-**Last Updated**: 2025-08-17
+**Last Updated**: 2025-08-18  
+**Total Endpoints**: 51 (33 CMS + 10 Batch + 8 MYOB)
 
 ## Authentication
 
@@ -222,6 +223,59 @@ X-API-Key: l36-cms-dev-2025
   ]
 }
 ```
+
+## 7. Batch Production Module (`/api/batches`)
+
+### Recipe Group Management
+
+| Method | Endpoint | Description | Auth | Implementation |
+|--------|----------|-------------|------|----------------|
+| GET | `/recipe-group/<int:id>/products` | Get products in recipe group with sizes | None | `app/batch_routes.py:489` |
+
+### Batch Operations
+
+| Method | Endpoint | Description | Auth | Implementation |
+|--------|----------|-------------|------|----------------|
+| POST | `/recipe-group/<int:id>` | Create multi-size batch for recipe group | None | `app/batch_routes.py:397` |
+| POST | `/recipe/<int:recipe_id>` | Create single product batch | None | `app/batch_routes.py:65` |
+| GET | `/recipe/<int:recipe_id>` | Get batches for a recipe | None | `app/batch_routes.py:18` |
+| GET | `/<int:batch_id>` | Get specific batch details | None | `app/batch_routes.py:220` |
+| PUT | `/<int:batch_id>` | Update batch (ingredients, notes) | None | `app/batch_routes.py:240` |
+| POST | `/<int:batch_id>/complete` | Complete batch (triggers MYOB) | None | `app/batch_routes.py:303` |
+| DELETE | `/<int:batch_id>` | Delete batch | None | `app/batch_routes.py:365` |
+
+## 8. MYOB Integration Module (`/api/myob`)
+
+### Authentication & Status
+
+| Method | Endpoint | Description | Auth | Implementation |
+|--------|----------|-------------|------|----------------|
+| GET | `/auth` | Generate OAuth authorization URL | JWT | `app/myob_routes.py:19` |
+| GET | `/callback` | OAuth callback handler | None | `app/myob_routes.py:44` |
+| GET | `/status` | Check MYOB integration status | None | `app/myob_routes.py:178` |
+
+### Inventory Operations
+
+| Method | Endpoint | Description | Auth | Implementation |
+|--------|----------|-------------|------|----------------|
+| POST | `/inventory/sync` | Pull inventory FROM MYOB | JWT | `app/myob_routes.py:94` |
+| POST | `/inventory/adjustment` | Create inventory adjustment | **None** | `app/myob_routes.py:281` |
+| POST | `/inventory/sync-to-myob` | Push changes TO MYOB | JWT | `app/myob_routes.py:314` |
+| POST | `/inventory/bulk-adjust` | Bulk stocktake adjustments | JWT | `app/myob_routes.py:344` |
+| POST | `/inventory/match` | Match products with MYOB UIDs | JWT | `app/myob_routes.py:212` |
+
+### Sales Recording
+
+| Method | Endpoint | Description | Auth | Implementation |
+|--------|----------|-------------|------|----------------|
+| POST | `/sales/record` | Record sale invoice in MYOB | JWT | `app/myob_routes.py:146` |
+
+## 9. Product Stock Management (`/api/products`)
+
+| Method | Endpoint | Description | Auth | Implementation |
+|--------|----------|-------------|------|----------------|
+| GET | `/recipe-groups` | List all recipe groups | None | `app/product_routes.py:1327` |
+| PATCH | `/<int:id>/stock` | Update product stock (adjustment) | None | `app/product_routes.py:436` |
 
 ## Error Responses
 
