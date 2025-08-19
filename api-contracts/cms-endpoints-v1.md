@@ -2,12 +2,12 @@
 
 ## Overview
 
-Content Management System endpoints for L36 MVPS internal operations. These endpoints handle checkout, order management, customer accounts, wholesale operations, newsletter management, and product reviews with AI moderation.
+Content Management System endpoints for L36 MVPS internal operations. These endpoints handle checkout, order management, customer accounts, wholesale operations with MYOB invoicing, newsletter management, and product reviews with AI moderation.
 
 **Base URL**: `http://localhost:5050/api/cms`  
-**Version**: 1.0  
+**Version**: 1.1  
 **Last Updated**: 2025-08-19  
-**Total Endpoints**: 71 (47 CMS + 10 Batch + 8 MYOB + 4 CVPS Wholesale + 2 Order Notes)
+**Total Endpoints**: 74 (50 CMS + 10 Batch + 8 MYOB + 4 CVPS Wholesale + 2 Balance/Credit)
 
 ## Authentication
 
@@ -45,6 +45,7 @@ Content Management System endpoints for L36 MVPS internal operations. These endp
 |--------|----------|-------------|------|----------------|
 | POST | `/commerce/orders/lookup` | Find order by email & order number | API Key | `app/cms/commerce/orders.py:62` |
 | GET | `/commerce/orders/<int:order_id>` | Get full order details | API Key | `app/cms/commerce/orders.py:110` |
+| GET | `/commerce/orders/by-session/<session_id>` | Get order by Stripe session ID | API Key | `app/cms/commerce/orders.py:194` |
 
 #### Webhook Handlers
 
@@ -76,6 +77,8 @@ Content Management System endpoints for L36 MVPS internal operations. These endp
 | POST | `/customers/wholesale/orders/create` | Create wholesale order with notes | JWT | `app/cms/customers/wholesale_orders.py:33` |
 | GET | `/customers/wholesale/orders/<int:order_id>` | Get wholesale order details | JWT | `app/cms/customers/wholesale_orders.py:147` |
 | POST | `/customers/wholesale/orders/<int:order_id>/add-note` | Add/update order notes | JWT | `app/cms/customers/wholesale_orders.py:212` |
+| GET | `/customers/wholesale/balance` | Get account balance from MYOB | JWT | `app/cms/customers/wholesale.py:487` |
+| POST | `/customers/wholesale/check-credit` | Check credit limit before order | JWT | `app/cms/customers/wholesale.py:537` |
 
 #### Newsletter
 

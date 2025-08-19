@@ -151,6 +151,54 @@ export interface OrderResponse {
   items: OrderItem[];
 }
 
+export interface OrderBySessionResponse {
+  success: boolean;
+  order: {
+    id: number;
+    order_number: string;
+    customer_email: string;
+    customer_name: string;
+    status: string;
+    payment_status: string;
+    payment_method: string;
+    total_amount: number;
+    subtotal_amount: number;
+    tax_amount: number;
+    shipping_cost: number;
+    discount_amount: number;
+    currency: string;
+    created_at: string | null;
+    estimated_delivery: string | null;
+    items: Array<{
+      id: number;
+      product_id: number | null;
+      product_name: string;
+      product_sku: string | null;
+      quantity: number;
+      unit_price: number;
+      total_price: number;
+      description: string;
+      image_url: string | null;
+    }>;
+    shipping_address: {
+      name: string;
+      address_line_1: string;
+      address_line_2: string;
+      city: string;
+      state: string;
+      postcode: string;
+      country: string;
+      phone: string | null;
+    } | null;
+    tracking: {
+      number: string | null;
+      url: string | null;
+      carrier: string | null;
+    };
+    email_confirmation_sent: boolean;
+  };
+}
+
 // ============================================
 // Customer Types
 // ============================================
