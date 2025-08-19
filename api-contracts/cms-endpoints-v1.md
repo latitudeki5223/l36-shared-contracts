@@ -6,8 +6,8 @@ Content Management System endpoints for L36 MVPS internal operations. These endp
 
 **Base URL**: `http://localhost:5050/api/cms`  
 **Version**: 1.0  
-**Last Updated**: 2025-08-18  
-**Total Endpoints**: 51 (33 CMS + 10 Batch + 8 MYOB)
+**Last Updated**: 2025-08-19  
+**Total Endpoints**: 58 (40 CMS + 10 Batch + 8 MYOB)
 
 ## Authentication
 
@@ -77,6 +77,18 @@ Content Management System endpoints for L36 MVPS internal operations. These endp
 |--------|----------|-------------|------|----------------|
 | POST | `/newsletter/subscribe` | Subscribe to newsletter | API Key | `app/cms/customers/accounts.py:190` |
 | GET | `/newsletter/unsubscribe/<token>` | Unsubscribe via token | None | `app/cms/customers/accounts.py:252` |
+
+#### Email Preferences
+
+| Method | Endpoint | Description | Auth | Implementation |
+|--------|----------|-------------|------|----------------|
+| GET | `/email-preferences` | Get customer email preferences | Bearer Token | `app/cms/customers/email_preferences.py:53` |
+| PUT | `/email-preferences` | Update customer email preferences | Bearer Token | `app/cms/customers/email_preferences.py:98` |
+| GET | `/email-history` | Get customer email history | Bearer Token | `app/cms/customers/email_preferences.py:179` |
+| GET | `/unsubscribe/<token>` | Verify unsubscribe token | None | `app/cms/customers/email_preferences.py:287` |
+| POST | `/unsubscribe/<token>` | Process unsubscribe request | None | `app/cms/customers/email_preferences.py:287` |
+| POST | `/generate-unsubscribe-link` | Generate unsubscribe link | Bearer Token | `app/cms/customers/email_preferences.py:402` |
+| GET | `/can-review/<int:product_id>` | Check if customer can review product | Bearer Token | `app/cms/customers/email_preferences.py:256` |
 
 #### Reviews
 

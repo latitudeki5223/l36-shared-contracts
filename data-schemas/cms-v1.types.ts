@@ -1,7 +1,7 @@
 /**
  * CMS API TypeScript Type Definitions v1.0
  * Generated from CMS implementation for CVPS integration
- * Last Updated: 2025-08-17
+ * Last Updated: 2025-08-19
  */
 
 // ============================================
@@ -196,6 +196,86 @@ export interface CreateCustomerRequest {
   shipping_state?: string;
   shipping_postcode?: string;
   shipping_country?: string;
+}
+
+// ============================================
+// Email Preference Types
+// ============================================
+
+export interface EmailPreferences {
+  customer_id: number;
+  email: string;
+  preferences: {
+    marketing_emails: boolean;
+    order_updates: boolean;
+    shipping_notifications: boolean;
+    review_requests: boolean;
+    newsletter: boolean;
+    special_offers: boolean;
+  };
+  updated_at: string | null;
+}
+
+export interface EmailPreferencesUpdateRequest {
+  preferences: {
+    marketing_emails?: boolean;
+    order_updates?: boolean;  // Note: Always true for transactional
+    shipping_notifications?: boolean;  // Note: Always true for transactional
+    review_requests?: boolean;
+    newsletter?: boolean;
+    special_offers?: boolean;
+  };
+}
+
+export interface EmailHistoryItem {
+  id: number;
+  subject: string;
+  type: string;
+  type_display: string;
+  sent_at: string | null;
+  status: string;
+  order?: {
+    id: number;
+    number: string;
+    total: number;
+    created_at: string;
+  };
+}
+
+export interface EmailHistoryResponse {
+  emails: EmailHistoryItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    total_items: number;
+    total_pages: number;
+  };
+}
+
+export interface UnsubscribeRequest {
+  type?: 'all' | 'marketing' | 'newsletter' | 'reviews';
+}
+
+export interface UnsubscribeResponse {
+  message: string;
+  email: string;
+  unsubscribed_types: string[];
+  remaining_subscriptions?: string[];
+}
+
+export interface ReviewEligibilityResponse {
+  can_review: boolean;
+  message: string;
+  product?: {
+    id: number;
+    name: string;
+    sku: string;
+  };
+  existing_review?: {
+    id: number;
+    rating: number;
+    created_at: string;
+  };
 }
 
 // ============================================
