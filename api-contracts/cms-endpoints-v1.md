@@ -7,7 +7,7 @@ Content Management System endpoints for L36 MVPS internal operations. These endp
 **Base URL**: `http://localhost:5050/api/cms`  
 **Version**: 1.0  
 **Last Updated**: 2025-08-19  
-**Total Endpoints**: 58 (40 CMS + 10 Batch + 8 MYOB)
+**Total Endpoints**: 71 (47 CMS + 10 Batch + 8 MYOB + 4 CVPS Wholesale + 2 Order Notes)
 
 ## Authentication
 
@@ -36,22 +36,22 @@ Content Management System endpoints for L36 MVPS internal operations. These endp
 
 | Method | Endpoint | Description | Auth | Implementation |
 |--------|----------|-------------|------|----------------|
-| POST | `/checkout/session` | Create payment session (Stripe/PayPal) | API Key | `app/cms/commerce/checkout.py:24` |
-| POST | `/checkout/calculate` | Calculate totals with tax/shipping | API Key | `app/cms/commerce/checkout.py:123` |
+| POST | `/commerce/create-checkout-session` | Create payment session (Stripe/PayPal) | API Key | `app/cms/commerce/checkout.py:24` |
+| POST | `/commerce/validate-cart` | Calculate totals with tax/shipping | API Key | `app/cms/commerce/checkout.py:123` |
 
 #### Order Management
 
 | Method | Endpoint | Description | Auth | Implementation |
 |--------|----------|-------------|------|----------------|
-| POST | `/orders/lookup` | Find order by email & order number | API Key | `app/cms/commerce/orders.py:62` |
-| GET | `/orders/<int:id>` | Get full order details | API Key | `app/cms/commerce/orders.py:110` |
+| POST | `/commerce/orders/lookup` | Find order by email & order number | API Key | `app/cms/commerce/orders.py:62` |
+| GET | `/commerce/orders/<int:order_id>` | Get full order details | API Key | `app/cms/commerce/orders.py:110` |
 
 #### Webhook Handlers
 
 | Method | Endpoint | Description | Auth | Implementation |
 |--------|----------|-------------|------|----------------|
-| POST | `/webhooks/stripe` | Stripe payment webhook | Stripe Sig | `app/cms/commerce/webhooks.py:35` |
-| POST | `/webhooks/paypal` | PayPal payment webhook | PayPal Verify | `app/cms/commerce/webhooks.py:157` |
+| POST | `/commerce/webhook/stripe` | Stripe payment webhook | Stripe Sig | `app/cms/commerce/webhooks.py:35` |
+| POST | `/commerce/webhook/paypal` | PayPal payment webhook | PayPal Verify | `app/cms/commerce/webhooks.py:157` |
 
 ### 2. Customers Module (`/api/cms/customers`)
 
@@ -59,46 +59,52 @@ Content Management System endpoints for L36 MVPS internal operations. These endp
 
 | Method | Endpoint | Description | Auth | Implementation |
 |--------|----------|-------------|------|----------------|
-| POST | `/create-or-get` | Find or create customer | API Key | `app/cms/customers/accounts.py:34` |
-| GET | `/<int:customer_id>` | Get customer details | API Key | `app/cms/customers/accounts.py:145` |
+| POST | `/customers/create-or-get` | Find or create customer | API Key | `app/cms/customers/accounts.py:34` |
+| GET | `/customers/<int:customer_id>` | Get customer details | API Key | `app/cms/customers/accounts.py:145` |
 
 #### Wholesale Operations
 
 | Method | Endpoint | Description | Auth | Implementation |
 |--------|----------|-------------|------|----------------|
-| POST | `/wholesale/login` | Wholesale account login | None | `app/cms/customers/wholesale.py:141` |
-| GET | `/wholesale/pricing` | Get wholesale prices from MYOB | JWT | `app/cms/customers/wholesale.py:219` |
-| GET | `/wholesale/orders` | Wholesale order history | JWT | `app/cms/customers/wholesale.py:262` |
-| GET | `/wholesale/account` | Get wholesale account details | JWT | `app/cms/customers/wholesale.py:331` |
+| POST | `/customers/wholesale/login` | Wholesale account login | None | `app/cms/customers/wholesale.py:82` |
+| GET | `/customers/wholesale/pricing` | Get wholesale prices from MYOB | JWT | `app/cms/customers/wholesale.py:172` |
+| GET | `/customers/wholesale/orders` | Wholesale order history | JWT | `app/cms/customers/wholesale.py:214` |
+| GET | `/customers/wholesale/account` | Get wholesale account details | JWT | `app/cms/customers/wholesale.py:279` |
+| POST | `/customers/wholesale/forgot-password` | Request password reset | None | `app/cms/customers/wholesale.py:322` |
+| POST | `/customers/wholesale/reset-password` | Reset password with token | None | `app/cms/customers/wholesale.py:372` |
+| POST | `/customers/wholesale/change-password` | Change password (authenticated) | JWT | `app/cms/customers/wholesale.py:432` |
+| POST | `/customers/wholesale/orders/create` | Create wholesale order with notes | JWT | `app/cms/customers/wholesale_orders.py:33` |
+| GET | `/customers/wholesale/orders/<int:order_id>` | Get wholesale order details | JWT | `app/cms/customers/wholesale_orders.py:147` |
+| POST | `/customers/wholesale/orders/<int:order_id>/add-note` | Add/update order notes | JWT | `app/cms/customers/wholesale_orders.py:212` |
 
 #### Newsletter
 
 | Method | Endpoint | Description | Auth | Implementation |
 |--------|----------|-------------|------|----------------|
-| POST | `/newsletter/subscribe` | Subscribe to newsletter | API Key | `app/cms/customers/accounts.py:190` |
-| GET | `/newsletter/unsubscribe/<token>` | Unsubscribe via token | None | `app/cms/customers/accounts.py:252` |
+| POST | `/customers/newsletter/subscribe` | Subscribe to newsletter | API Key | `app/cms/customers/accounts.py:190` |
+| GET | `/customers/newsletter/unsubscribe/<token>` | Unsubscribe via token | None | `app/cms/customers/accounts.py:252` |
 
 #### Email Preferences
 
 | Method | Endpoint | Description | Auth | Implementation |
 |--------|----------|-------------|------|----------------|
-| GET | `/email-preferences` | Get customer email preferences | Bearer Token | `app/cms/customers/email_preferences.py:53` |
-| PUT | `/email-preferences` | Update customer email preferences | Bearer Token | `app/cms/customers/email_preferences.py:98` |
-| GET | `/email-history` | Get customer email history | Bearer Token | `app/cms/customers/email_preferences.py:179` |
-| GET | `/unsubscribe/<token>` | Verify unsubscribe token | None | `app/cms/customers/email_preferences.py:287` |
-| POST | `/unsubscribe/<token>` | Process unsubscribe request | None | `app/cms/customers/email_preferences.py:287` |
-| POST | `/generate-unsubscribe-link` | Generate unsubscribe link | Bearer Token | `app/cms/customers/email_preferences.py:402` |
-| GET | `/can-review/<int:product_id>` | Check if customer can review product | Bearer Token | `app/cms/customers/email_preferences.py:256` |
+| GET | `/customers/email-preferences` | Get customer email preferences | Bearer Token | `app/cms/customers/email_preferences.py:53` |
+| PUT | `/customers/email-preferences` | Update customer email preferences | Bearer Token | `app/cms/customers/email_preferences.py:98` |
+| GET | `/customers/email-history` | Get customer email history | Bearer Token | `app/cms/customers/email_preferences.py:179` |
+| GET | `/customers/unsubscribe/<token>` | Verify unsubscribe token | None | `app/cms/customers/email_preferences.py:287` |
+| POST | `/customers/unsubscribe/<token>` | Process unsubscribe request | None | `app/cms/customers/email_preferences.py:287` |
+| POST | `/customers/generate-unsubscribe-link` | Generate unsubscribe link | Bearer Token | `app/cms/customers/email_preferences.py:402` |
+| GET | `/customers/can-review/<int:product_id>` | Check if customer can review product | Bearer Token | `app/cms/customers/email_preferences.py:256` |
 
 #### Reviews
 
 | Method | Endpoint | Description | Auth | Implementation |
 |--------|----------|-------------|------|----------------|
-| POST | `/reviews` | Submit product review with AI processing | API Key | `app/cms/customers/reviews.py:170` |
-| POST | `/reviews/<int:id>/reply` | Manual reply to review | Admin | `app/cms/customers/reviews.py:343` |
-| POST | `/reviews/<int:id>/quick-reply` | Generate AI reply suggestion | Admin | `app/cms/customers/reviews.py:460` |
-| PATCH | `/reviews/<int:id>/approve` | Approve pending review | Admin | `app/cms/customers/reviews.py:406` |
-| PATCH | `/reviews/<int:id>/testimonial` | Toggle testimonial status | Admin | `app/cms/customers/reviews.py:435` |
+| POST | `/customers/reviews` | Submit product review with AI processing | API Key | `app/cms/customers/reviews.py:170` |
+| POST | `/customers/reviews/<int:review_id>/reply` | Manual reply to review | Admin | `app/cms/customers/reviews.py:343` |
+| POST | `/customers/reviews/<int:review_id>/quick-reply` | Generate AI reply suggestion | Admin | `app/cms/customers/reviews.py:460` |
+| PATCH | `/customers/reviews/<int:review_id>/approve` | Approve pending review | Admin | `app/cms/customers/reviews.py:406` |
+| PATCH | `/customers/reviews/<int:review_id>/testimonial` | Toggle testimonial status | Admin | `app/cms/customers/reviews.py:435` |
 
 ### 3. Marketing Module (`/api/cms/marketing`)
 
@@ -106,16 +112,16 @@ Content Management System endpoints for L36 MVPS internal operations. These endp
 
 | Method | Endpoint | Description | Auth | Implementation |
 |--------|----------|-------------|------|----------------|
-| GET | `/newsletter/export` | Export subscribers as CSV | Admin | `app/cms/marketing/newsletter.py:29` |
-| GET | `/newsletter/stats` | Get subscription statistics | Admin | `app/cms/marketing/newsletter.py:131` |
-| POST | `/newsletter/manual-subscribe` | Admin manual add | Admin | `app/cms/marketing/newsletter.py:195` |
-| GET | `/newsletter/search` | Search subscribers | Admin | `app/cms/marketing/newsletter.py:270` |
+| GET | `/marketing/newsletter/export` | Export subscribers as CSV | Admin | `app/cms/marketing/newsletter.py:29` |
+| GET | `/marketing/newsletter/stats` | Get subscription statistics | Admin | `app/cms/marketing/newsletter.py:131` |
+| POST | `/marketing/newsletter/manual-subscribe` | Admin manual add | Admin | `app/cms/marketing/newsletter.py:195` |
+| GET | `/marketing/newsletter/search` | Search subscribers | Admin | `app/cms/marketing/newsletter.py:270` |
 
 #### Testimonials
 
 | Method | Endpoint | Description | Auth | Implementation |
 |--------|----------|-------------|------|----------------|
-| GET | `/testimonials` | Get featured testimonials for homepage | None | `app/marketing_routes.py:442` |
+| GET | `/marketing/testimonials` | Get featured testimonials for homepage | None | `app/marketing_routes.py:442` |
 
 ### 4. Admin Module (`/api/cms/admin`)
 
@@ -123,9 +129,9 @@ Content Management System endpoints for L36 MVPS internal operations. These endp
 
 | Method | Endpoint | Description | Auth | Implementation |
 |--------|----------|-------------|------|----------------|
-| GET | `/orders` | List all orders with filtering | Admin | `app/cms/admin/orders.py:36` |
-| PATCH | `/orders/<int:id>/status` | Update order status | Admin | `app/cms/admin/orders.py:99` |
-| PATCH | `/orders/<int:id>/tracking` | Add/update tracking number | Admin | `app/cms/admin/orders.py:164` |
+| GET | `/admin/orders` | List all orders with filtering | Admin | `app/cms/admin/orders.py:36` |
+| PATCH | `/admin/orders/<int:order_id>/status` | Update order status | Admin | `app/cms/admin/orders.py:99` |
+| PATCH | `/admin/orders/<int:order_id>/tracking` | Add/update tracking number | Admin | `app/cms/admin/orders.py:164` |
 
 ## Additional Review Endpoints
 
@@ -355,6 +361,62 @@ Five hardcoded wholesale accounts with MYOB integration:
 - Collection only - actual sending via Mailchimp
 - CSV export is Mailchimp-compatible
 - Automatic tagging (customer, wholesale, source)
+
+## CVPS Wholesale Endpoints
+
+### Overview
+Protected B2B endpoints for CVPS that require wholesale authentication. These endpoints provide product data with wholesale pricing for authenticated B2B customers.
+
+**Base URL**: `http://localhost:5050/api/cvps/wholesale`  
+**Authentication**: JWT Bearer token from wholesale login
+
+### Endpoints
+
+| Method | Endpoint | Description | Auth | Implementation |
+|--------|----------|-------------|------|----------------|
+| GET | `/products` | Get all products with wholesale pricing | JWT | `app/cvps_processor/wholesale_routes.py:122` |
+| GET | `/products/search` | Search products with wholesale pricing | JWT | `app/cvps_processor/wholesale_routes.py:169` |
+| GET | `/products/<int:id>` | Get single product with wholesale pricing | JWT | `app/cvps_processor/wholesale_routes.py:235` |
+| GET | `/categories` | Get categories with wholesale product counts | JWT | `app/cvps_processor/wholesale_routes.py:277` |
+
+### Response Format
+
+Products include both retail and wholesale pricing:
+
+```json
+{
+  "success": true,
+  "products": [{
+    "id": 1,
+    "name": "Premium Honey",
+    "price": {
+      "retail": 10.00,
+      "wholesale": 5.00,
+      "savings": 5.00,
+      "savings_percentage": 50.0
+    },
+    "minOrderQuantity": 6,
+    "images": {
+      "main": {"url": "/media/...", "alt": "..."},
+      "gallery": [...]
+    },
+    "tags": ["organic", "local"],
+    "stockQuantity": 100
+  }],
+  "customer": {
+    "company": "Cliffords Honey Farm",
+    "paymentTerms": "30",
+    "creditLimit": 5000.00,
+    "outstandingBalance": 1250.00
+  }
+}
+```
+
+### Security Notes
+- Public CVPS endpoints (`/api/cvps/products`) no longer include wholesale prices
+- Wholesale prices are only accessible via authenticated endpoints
+- JWT tokens expire after 24 hours
+- Same token used for both CMS and CVPS wholesale endpoints
 
 ## Testing
 
