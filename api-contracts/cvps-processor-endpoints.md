@@ -5,7 +5,7 @@ Last Updated: 2025-10-06
 
 ## Overview
 
-The CVPS Processor provides **22 optimized endpoints** (18 public content + 4 wholesale) that consolidate data from multiple sources into single, efficient API calls. These endpoints are designed specifically for the Customer-facing VPS (CVPS) frontend at staging.latitude36.com.au and latitude36.com.au.
+The CVPS Processor provides **22 optimized endpoints** (18 public content + 4 wholesale) that consolidate data from multiple sources into single, efficient API calls. These endpoints are designed specifically for the Customer-facing VPS (CVPS) frontend, deployed across staging and production environments.
 
 ### Version 4.1 Breaking Changes
 - **AUTHENTICATION REMOVED**: Most endpoints are now PUBLIC (no API key required)
@@ -33,8 +33,15 @@ Wholesale endpoints are available at: `/api/cvps/wholesale/*`
 
 ## Base URL
 
-- **Staging**: `https://staging.l36.com.au/api/cvps`
-- **Production**: `https://l36.com.au/api/cvps`
+The CVPS processor endpoints are available at:
+```
+{BASE_URL}/api/cvps
+```
+
+Where `{BASE_URL}` is the environment-specific MVPS domain:
+- Staging environments use their staging domain
+- Production environments use their production domain
+- Local development uses localhost with appropriate port
 
 ## Response Format
 
@@ -420,8 +427,9 @@ All media URLs are returned as **relative paths** starting with `/media/`:
 ```
 
 The CVPS frontend constructs full URLs by prepending the API base URL:
-- Staging: `https://staging.l36.com.au/media/products/honey-main.jpg`
-- Production: `https://l36.com.au/media/products/honey-main.jpg`
+- Example: `{BASE_URL}/media/products/honey-main.jpg`
+
+Where `{BASE_URL}` is the environment-specific MVPS domain (loaded from environment configuration)
 
 ## Product Tagging System
 
