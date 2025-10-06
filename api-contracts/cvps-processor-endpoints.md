@@ -1,38 +1,39 @@
 # CVPS Processor API Endpoints Specification
 
-Version: 3.1 - Enhanced Product Tagging System  
-Last Updated: 2025-08-05
+Version: 4.1 - Public Access Architecture
+Last Updated: 2025-10-06
 
 ## Overview
 
-The CVPS Processor provides **15 optimized endpoints** (8 list + 6 individual + 1 enhanced search) that consolidate data from multiple sources into single, efficient API calls. These endpoints are designed specifically for the Customer-facing VPS (CVPS) frontend at dev.latitude36.com.au.
+The CVPS Processor provides **22 optimized endpoints** (18 public content + 4 wholesale) that consolidate data from multiple sources into single, efficient API calls. These endpoints are designed specifically for the Customer-facing VPS (CVPS) frontend at staging.latitude36.com.au and latitude36.com.au.
 
-### Version 3.1 New Features
-- **Enhanced Product Search**: New `/products/search` endpoint with tag filtering, price ranges, and advanced sorting
-- **Product Tagging System**: All product endpoints now include `tags`, `searchTerms`, and `tagCategories` fields
-- **Filter Options**: Search responses include available filters for dynamic UI construction
-- **Backward Compatibility**: All existing endpoints continue to work unchanged
+### Version 4.1 Breaking Changes
+- **AUTHENTICATION REMOVED**: Most endpoints are now PUBLIC (no API key required)
+- **New Endpoints**: Added shipping, business-info, and address validation
+- **Wholesale Module**: Separate authenticated endpoints for B2B customers
+- **Total Endpoints**: Increased from 15 to 22
 
 ## Authentication
 
-All endpoints require authentication via headers:
+### Public Endpoints (No Authentication Required)
+The following 18 endpoints are completely public and require NO authentication headers:
+- All content endpoints (homepage, products, blog, etc.)
+- Shipping information
+- Business information
+- Address validation
+- Health check
 
+### Wholesale Endpoints (JWT Authentication)
+The 4 wholesale endpoints require JWT Bearer token authentication:
 ```http
-X-API-Key: {api_key}
-X-Site-ID: {site_id}
+Authorization: Bearer {jwt_token}
 ```
 
-### Valid Credentials:
-- **Development**: 
-  - API Key: `cvps-dev-key-2025`
-  - Site ID: `dev.latitude36.com.au`
-- **Production**: 
-  - API Key: `cvps-prod-key-2025`
-  - Site ID: `latitude36.com.au`
+Wholesale endpoints are available at: `/api/cvps/wholesale/*`
 
 ## Base URL
 
-- **Development**: `http://localhost:5050/api/cvps`
+- **Staging**: `https://staging.l36.com.au/api/cvps`
 - **Production**: `https://l36.com.au/api/cvps`
 
 ## Response Format
@@ -42,7 +43,7 @@ All endpoints return consistent JSON responses:
 ```json
 {
   "success": true,
-  "cached_at": "2025-08-05T08:59:00.000Z",
+  "cached_at": "2025-10-06T08:59:00.000Z",
   "data": {/* endpoint-specific data */}
 }
 ```
@@ -68,8 +69,10 @@ All endpoints implement intelligent caching with appropriate TTLs:
 - **Newsletter**: 15 minutes
 - **Galleries**: 5 minutes
 - **Individual Items**: 15-30 minutes
+- **Shipping**: 24 hours
+- **Business Info**: 24 hours
 
-## Core Endpoints
+## Public Content Endpoints (18)
 
 ### 1. Health Check
 ```http
@@ -82,21 +85,49 @@ GET /health
   "status": "healthy",
   "service": "cvps_processor",
   "database": "connected",
-  "cache": {"enabled": false},
+  "cache": {
+    "enabled": true,
+    "memory_used": "1.11M",
+    "hits": 1,
+    "misses": 1
+  },
   "version": "2.0",
-  "endpoints_available": 15,
+  "endpoints_available": 22,
   "features": [
     "product_tagging",
-    "enhanced_search", 
+    "enhanced_search",
     "price_filtering",
     "multi_category_support",
-    "tag_categories"
+    "tag_categories",
+    "wholesale_module",
+    "address_validation"
   ],
-  "timestamp": "2025-08-05T08:59:00.000Z"
+  "timestamp": "2025-10-06T08:59:00.000Z"
 }
 ```
 
-### 2. Homepage Content
+### 2. Shipping Information ⭐ NEW
+```http
+GET /shipping
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "shipping": {
+    "cost": 15.00,
+    "currency": "AUD",
+    "method": "Standard Shipping",
+    "estimated_days": "3-7 business days",
+    "free_shipping_threshold": 100.00,
+    "notes": "Free shipping on orders over $100"
+  },
+  "cached_at": "2025-10-06T08:59:00.000Z"
+}
+```
+
+### 3. Homepage Content
 ```http
 GET /homepage
 ```
@@ -123,12 +154,12 @@ GET /homepage
     "pressSection": {/* media mentions */},
     "seo": {/* SEO metadata */}
   },
-  "cached_at": "2025-08-05T08:59:00.000Z",
+  "cached_at": "2025-10-06T08:59:00.000Z",
   "version": "1.0"
 }
 ```
 
-### 3. Product Catalog (Legacy)
+### 4. Product Catalog
 ```http
 GET /products
 ```
@@ -187,11 +218,11 @@ GET /products
     ],
     "price_range": {"min": 7.5, "max": 33.5, "average": 15.55}
   },
-  "cached_at": "2025-08-05T08:59:00.000Z"
+  "cached_at": "2025-10-06T08:59:00.000Z"
 }
 ```
 
-### 4. Enhanced Product Search ⭐ NEW
+### 5. Enhanced Product Search
 ```http
 GET /products/search
 ```
@@ -208,58 +239,7 @@ GET /products/search
 - `sort_by`: Sort field (`name`, `price`, `created`, `popularity`)
 - `sort_order`: Sort direction (`asc`, `desc`)
 
-**Example Requests:**
-```http
-# Basic text search
-GET /products/search?q=honey
-
-# Tag filtering
-GET /products/search?tags=raw&tags=wildflower
-
-# Price range with sorting  
-GET /products/search?price_min=10&price_max=25&sort_by=price&sort_order=asc
-
-# Combined filters
-GET /products/search?q=honey&tags=organic&price_max=20&sort_by=name
-```
-
-**Response Structure:**
-```json
-{
-  "success": true,
-  "products": [/*same product structure as above*/],
-  "pagination": {/*pagination info*/},
-  "filters": {
-    "tags": ["raw", "pure", "organic", "wildflower", "lavender"],
-    "tag_categories": [
-      {
-        "name": "Type",
-        "description": "Honey varieties and processing types", 
-        "color": "#FFB800",
-        "tags": ["raw", "pure", "creamed", "liquid"]
-      },
-      {
-        "name": "Origin",
-        "description": "Geographic source of honey",
-        "color": "#00A86B", 
-        "tags": ["kangaroo-island", "local", "aussie"]
-      }
-    ],
-    "price_range": {"min": 7.5, "max": 33.5, "average": 15.55}
-  },
-  "searchParams": {
-    "q": "honey",
-    "tags": ["raw", "wildflower"],
-    "categories": [],
-    "priceRange": {"min": 10, "max": 25},
-    "sortBy": "price",
-    "sortOrder": "asc"
-  },
-  "cached_at": "2025-08-05T08:59:00.000Z"
-}
-```
-
-### 5. Blog Posts
+### 6. Blog Posts
 ```http
 GET /blog
 ```
@@ -267,87 +247,17 @@ GET /blog
 **Query Parameters:**
 - `limit`: Number of posts (default: 3, max: 50)
 
-**Response Structure:**
-```json
-{
-  "success": true,
-  "posts": [
-    {
-      "id": 1,
-      "title": "Spring Honey Harvest Update",
-      "slug": "spring-honey-harvest-update",
-      "excerpt": "Our spring harvest brings unique flavors...",
-      "featuredImage": {"url": "/media/blog/harvest-update.jpg", "alt": "Spring harvest"},
-      "publishedAt": "2025-08-01T00:00:00.000Z",
-      "author": "Latitude 36 Team",
-      "category": "Farm News",
-      "tags": ["harvest", "spring", "honey"],
-      "readTime": "3 min"
-    }
-  ],
-  "total": 12,
-  "cached_at": "2025-08-05T08:59:00.000Z"
-}
-```
-
-### 6. Categories
+### 7. Categories
 ```http
 GET /categories
 ```
 
-**Response Structure:**
-```json
-{
-  "success": true,
-  "categories": [
-    {
-      "id": 1,
-      "name": "Raw Honey",
-      "slug": "raw-honey",
-      "level": 0,
-      "productCount": 15,
-      "children": [
-        {
-          "id": 2,
-          "name": "Wildflower Honey",
-          "slug": "wildflower-honey", 
-          "level": 1,
-          "productCount": 8,
-          "children": []
-        }
-      ]
-    }
-  ],
-  "cached_at": "2025-08-05T08:59:00.000Z"
-}
-```
-
-### 7. Newsletter Configuration
+### 8. Newsletter Configuration
 ```http
 GET /newsletter
 ```
 
-**Response Structure:**
-```json
-{
-  "success": true,
-  "content": {
-    "title": "Stay Connected",
-    "description": "Get updates on new honey varieties, farm news, and special offers.",
-    "placeholder": "Enter your email address",
-    "buttonText": "Subscribe", 
-    "privacyText": "We respect your privacy and never share your information.",
-    "settings": {
-      "enabled": true,
-      "doubleOptIn": true,
-      "confirmationRequired": true
-    }
-  },
-  "cached_at": "2025-08-05T08:59:00.000Z"
-}
-```
-
-### 8. Galleries
+### 9. Galleries
 ```http
 GET /galleries
 ```
@@ -355,208 +265,148 @@ GET /galleries
 **Query Parameters:**
 - `limit`: Number of galleries (default: 10, max: 50)
 
-**Response Structure:**
-```json
-{
-  "success": true,
-  "galleries": [
-    {
-      "id": 1,
-      "title": "Farm Life Spring 2025",
-      "description": "Behind the scenes at our honey farm",
-      "slug": "farm-life-spring-2025",
-      "imageCount": 24,
-      "publishedAt": "2025-08-01T00:00:00.000Z",
-      "images": [
-        {
-          "id": 1,
-          "url": "/media/galleries/farm-life/spring-1.jpg",
-          "alt": "Beehives in spring sunshine",
-          "caption": "Our hives enjoying the spring weather",
-          "order": 1,
-          "dimensions": {"width": 1200, "height": 800},
-          "aspectRatio": 1.5
-        }
-      ]
-    }
-  ],
-  "total": 8,
-  "cached_at": "2025-08-05T08:59:00.000Z"
-}
-```
-
-## Individual Item Endpoints
-
-### 9. Product by ID
-```http
-GET /products/{id}
-```
-
-### 10. Product by Slug  
-```http
-GET /products/slug/{slug}
-```
-
-**Response Structure (both):**
-```json
-{
-  "success": true,
-  "product": {
-    "id": 1,
-    "name": "Pure Kangaroo Island Honey",
-    "slug": "pure-kangaroo-island-honey",
-    "number": "HONEY-001",
-    "shortDescription": "Raw honey from pristine Kangaroo Island",
-    "longDescription": "Detailed product description...",
-    "price": {"website": 15.50, "wholesale": 12.00},
-    "categories": [
-      {"id": 1, "name": "Raw Honey", "slug": "raw-honey", "is_primary": true},
-      {"id": 5, "name": "Local Products", "slug": "local-products", "is_primary": false}
-    ],
-    "primaryCategory": {"id": 1, "name": "Raw Honey", "slug": "raw-honey", "is_primary": true},
-    "images": {
-      "main": {"url": "/media/products/honey-main.jpg", "alt": "Main product image"},
-      "thumbnails": [
-        {"url": "/media/products/honey-thumb1.jpg", "alt": "Thumbnail 1"},
-        {"url": "/media/products/honey-thumb2.jpg", "alt": "Thumbnail 2"}
-      ]
-    },
-    "isActive": true,
-    "tags": ["raw", "kangaroo-island", "pure", "wildflower"],
-    "searchTerms": ["honey", "raw honey", "pure honey", "ki honey"],
-    "tagCategories": {
-      "type": ["raw", "pure"],
-      "origin": ["kangaroo-island"],
-      "benefits": ["natural", "healthy"],
-      "flavor": ["wildflower", "complex"]
-    }
-  }
-}
-```
-
-### 11. Blog Post by ID
-```http
-GET /blog/{id}
-```
-
-### 12. Blog Post by Slug
-```http
-GET /blog/slug/{slug}
-```
-
-**Response Structure (both):**
-```json
-{
-  "success": true,
-  "post": {
-    "id": 1,
-    "title": "Spring Honey Harvest Update",
-    "slug": "spring-honey-harvest-update",
-    "content": {/*rich content object*/},
-    "excerpt": "Our spring harvest brings unique flavors...",
-    "publishedAt": "2025-08-01T00:00:00.000Z",
-    "updatedAt": "2025-08-01T12:00:00.000Z",
-    "author": "Latitude 36 Team",
-    "category": "Farm News",
-    "tags": ["harvest", "spring", "honey"],
-    "featuredImage": {"url": "/media/blog/harvest-update.jpg", "alt": "Spring harvest"},
-    "galleries": [{"id": 1}],
-    "seo": {
-      "title": "Spring Honey Harvest Update - Latitude 36",
-      "description": "Latest update on our spring honey harvest...",
-      "keywords": ["honey", "harvest", "spring", "kangaroo island"]
-    }
-  }
-}
-```
-
-### 13. Category by ID
-```http
-GET /categories/{id}
-```
-
-### 14. Category by Slug
-```http
-GET /categories/slug/{slug}
-```
-
-**Response Structure (both):**
-```json
-{
-  "success": true,
-  "category": {
-    "id": 1,
-    "name": "Raw Honey",
-    "slug": "raw-honey",
-    "parentId": null,
-    "level": 0,
-    "description": "Unprocessed honey straight from the hive",
-    "image": "/media/categories/raw-honey-banner.jpg",
-    "subcategories": [
-      {"id": 2, "name": "Wildflower Honey", "slug": "wildflower-honey", "product_count": 8}
-    ]
-  },
-  "products": [
-    {
-      "id": 1, 
-      "name": "Pure Kangaroo Island Honey",
-      "slug": "pure-kangaroo-island-honey",
-      "number": "HONEY-001",
-      "shortDescription": "Raw honey from pristine Kangaroo Island",
-      "price": 15.50,
-      "mainImage": "/media/products/honey-main.jpg",
-      "thumbnail": "/media/products/honey-thumb1.jpg",
-      "isActive": true,
-      "tags": ["raw", "kangaroo-island", "pure"],
-      "searchTerms": ["honey", "raw honey", "pure honey"]
-    }
-  ],
-  "total": 15
-}
-```
-
-### 15. Gallery by Slug
+### 10. Gallery by Slug
 ```http
 GET /galleries/{slug}
 ```
 
-**Response Structure:**
+### 11. Product by ID
+```http
+GET /products/{id}
+```
+
+### 12. Product by Slug
+```http
+GET /products/slug/{slug}
+```
+
+### 13. Blog Post by ID
+```http
+GET /blog/{id}
+```
+
+### 14. Blog Post by Slug
+```http
+GET /blog/slug/{slug}
+```
+
+### 15. Category by ID
+```http
+GET /categories/{id}
+```
+
+### 16. Category by Slug
+```http
+GET /categories/slug/{slug}
+```
+
+### 17. Business Information ⭐ NEW
+```http
+GET /business-info
+```
+
+**Response:**
 ```json
 {
   "success": true,
-  "gallery": {
-    "id": 1,
-    "title": "Farm Life Spring 2025",
-    "description": "Behind the scenes at our honey farm during spring",
-    "slug": "farm-life-spring-2025",
-    "layout": "masonry",
-    "columns": 3,
-    "showCaptions": true,
-    "spacing": "normal",
-    "publishedAt": "2025-08-01T00:00:00.000Z",
-    "createdBy": "admin",
-    "createdAt": "2025-07-15T00:00:00.000Z",
-    "updatedAt": "2025-08-01T00:00:00.000Z",
-    "seo": {
-      "metaDescription": "Photo gallery showcasing spring activities at our Kangaroo Island honey farm",
-      "keywords": ["farm", "spring", "beehives", "honey", "kangaroo island"]
+  "business": {
+    "name": "Latitude 36",
+    "tagline": "Pure honey from Kangaroo Island",
+    "abn": "123456789",
+    "email": "info@latitude36.com.au",
+    "phone": "+61 8 8553 1234",
+    "address": {
+      "street": "1113 Moores Road",
+      "city": "Haines",
+      "state": "SA",
+      "postcode": "5223",
+      "country": "Australia"
     },
-    "images": [
-      {
-        "id": 1,
-        "url": "/media/galleries/farm-life/spring-1.jpg",
-        "alt": "Beehives in spring sunshine",
-        "caption": "Our hives enjoying the spring weather", 
-        "order": 1,
-        "dimensions": {"width": 1200, "height": 800},
-        "fileType": "image/jpeg",
-        "size": 245760,
-        "aspectRatio": 1.5
-      }
-    ]
-  }
+    "social": {
+      "facebook": "https://facebook.com/latitude36",
+      "instagram": "https://instagram.com/latitude36honey"
+    },
+    "hours": {
+      "monday": "9:00 AM - 5:00 PM",
+      "tuesday": "9:00 AM - 5:00 PM",
+      "wednesday": "9:00 AM - 5:00 PM",
+      "thursday": "9:00 AM - 5:00 PM",
+      "friday": "9:00 AM - 5:00 PM",
+      "saturday": "10:00 AM - 2:00 PM",
+      "sunday": "Closed"
+    }
+  },
+  "cached_at": "2025-10-06T08:59:00.000Z"
 }
 ```
+
+### 18. Address Validation ⭐ NEW
+```http
+POST /address/validate
+```
+
+**Request Body:**
+```json
+{
+  "street": "1113 Moores Road",
+  "suburb": "Haines",
+  "state": "SA",
+  "postcode": "5223"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "valid": true,
+  "normalized": {
+    "street": "1113 MOORES RD",
+    "suburb": "HAINES",
+    "state": "SA",
+    "postcode": "5223",
+    "country": "AUSTRALIA"
+  },
+  "suggestions": [],
+  "delivery_point_id": "12345678"
+}
+```
+
+## Wholesale Endpoints (4) - JWT Required
+
+All wholesale endpoints require JWT authentication and are prefixed with `/api/cvps/wholesale/`
+
+### W1. Wholesale Product Catalog
+```http
+GET /api/cvps/wholesale/products
+Authorization: Bearer {jwt_token}
+```
+
+Returns products with wholesale pricing, minimum order quantities, and bulk discounts.
+
+### W2. Wholesale Product Search
+```http
+GET /api/cvps/wholesale/products/search
+Authorization: Bearer {jwt_token}
+```
+
+Enhanced search with wholesale-specific filters and pricing tiers.
+
+### W3. Wholesale Product Detail
+```http
+GET /api/cvps/wholesale/products/{id}
+Authorization: Bearer {jwt_token}
+```
+
+Detailed product information including volume pricing breaks.
+
+### W4. Wholesale Categories
+```http
+GET /api/cvps/wholesale/categories
+Authorization: Bearer {jwt_token}
+```
+
+Categories with wholesale product counts and B2B-specific information.
 
 ## Media URL Strategy
 
@@ -570,18 +420,13 @@ All media URLs are returned as **relative paths** starting with `/media/`:
 ```
 
 The CVPS frontend constructs full URLs by prepending the API base URL:
-- Development: `http://localhost:5050/media/products/honey-main.jpg`
+- Staging: `https://staging.l36.com.au/media/products/honey-main.jpg`
 - Production: `https://l36.com.au/media/products/honey-main.jpg`
 
-This strategy enables:
-- CDN flexibility
-- Environment portability
-- Simplified cache invalidation
-
-## Product Tagging System (Version 3.1)
+## Product Tagging System
 
 ### Tag Structure
-Products now include comprehensive tagging data:
+Products include comprehensive tagging data:
 
 ```json
 {
@@ -597,29 +442,19 @@ Products now include comprehensive tagging data:
 ```
 
 ### Tag Categories
-The system supports organized tag categories:
-
 - **Type**: Processing and variety (raw, creamed, liquid, pure)
-- **Origin**: Geographic source (kangaroo-island, local, aussie)  
+- **Origin**: Geographic source (kangaroo-island, local, aussie)
 - **Flavor**: Taste profiles (wildflower, eucalyptus, complex, mild)
 - **Benefits**: Health and wellness (natural, healthy, antioxidant, antibacterial)
 - **Occasion**: Usage scenarios (breakfast, cooking, gift, medicinal)
 - **Season**: Harvest timing (spring, summer, autumn, winter)
-
-### Search and Filtering
-Enhanced search supports:
-- **Text Search**: Searches name, description, and searchTerms
-- **Tag Filtering**: Multiple tags with OR logic
-- **Price Ranges**: Min/max price filtering
-- **Sorting**: By name, price, creation date, popularity
-- **Category Filtering**: Multiple categories
 
 ## Error Handling
 
 ### HTTP Status Codes
 - `200`: Success
 - `400`: Bad Request (validation errors)
-- `401`: Unauthorized (missing/invalid credentials)
+- `401`: Unauthorized (JWT required for wholesale endpoints only)
 - `404`: Not Found (resource doesn't exist)
 - `429`: Rate Limited (too many requests)
 - `500`: Internal Server Error
@@ -640,7 +475,7 @@ Enhanced search supports:
 
 ## Rate Limiting
 
-- **Rate Limit**: 100 requests per minute per API key
+- **Rate Limit**: 100 requests per minute per IP (public endpoints)
 - **Burst Limit**: 10 requests per second
 - **Headers**: Rate limit status included in response headers
 
@@ -666,32 +501,46 @@ Enhanced search supports:
 
 ## Version History
 
+### Version 4.1 (2025-10-06)
+- 🔴 **BREAKING**: Removed API key requirement for public endpoints
+- ✅ Added shipping endpoint (`/shipping`)
+- ✅ Added business information endpoint (`/business-info`)
+- ✅ Added address validation endpoint (`/address/validate`)
+- ✅ Added wholesale module with 4 B2B endpoints
+- ✅ Total endpoints increased to 22 (18 public + 4 wholesale)
+- ✅ Implemented JWT authentication for wholesale endpoints only
+
 ### Version 3.1 (2025-08-05)
 - ✅ Added enhanced product search endpoint (`/products/search`)
-- ✅ Implemented product tagging system (tags, searchTerms, tagCategories)
+- ✅ Implemented product tagging system
 - ✅ Added filter options in search responses
 - ✅ Price range and advanced sorting capabilities
-- ✅ Maintained full backward compatibility
 
 ### Version 3.0 (2025-08-03)
-- Added individual item endpoints (products, blog posts, categories by ID/slug)
-- Enhanced gallery system with detailed image metadata
-- Improved media URL handling with relative paths
+- Added individual item endpoints
+- Enhanced gallery system
+- Improved media URL handling
 - Optimized caching strategies
 
 ### Version 2.0 (2025-07-15)
 - Complete CVPS processor implementation
-- All 14 core endpoints operational
+- All core endpoints operational
 - Authentication and caching systems
-- URL builder compliance
 
 ### Version 1.0 (2025-06-01)
 - Initial CVPS processor specification
 - Basic endpoint structure defined
-- Authentication requirements established
+
+## Implementation Files
+
+- **Main Routes**: `/home/admin/l36-staging/backend/app/cvps_processor/routes.py`
+- **Wholesale Routes**: `/home/admin/l36-staging/backend/app/cvps_processor/wholesale_routes.py`
+- **Aggregators**: `/home/admin/l36-staging/backend/app/cvps_processor/aggregators.py`
+- **Formatters**: `/home/admin/l36-staging/backend/app/cvps_processor/formatters.py`
 
 ---
 
-**Generated by**: MVPS-CVPS Management Agent  
-**Documentation Status**: ✅ CURRENT - All endpoints tested and operational  
-**Last Validation**: 2025-08-05 18:59:00 UTC
+**Generated by**: MVPS-CVPS Management Agent
+**Documentation Status**: ✅ CURRENT - Version 4.1 fully operational
+**Last Validation**: 2025-10-06 12:30:00 UTC
+**Total Endpoints**: 22 (18 public + 4 wholesale)
