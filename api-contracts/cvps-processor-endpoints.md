@@ -43,6 +43,109 @@ Where `{BASE_URL}` is the environment-specific MVPS domain:
 - Production environments use their production domain
 - Local development uses localhost with appropriate port
 
+## Multi-Tenant Support 🆕
+
+**Status**: Database Ready (Phase 1 Complete), Backend Implementation Pending (Phase 2-3)
+
+All CVPS endpoints support multi-tenant isolation via the `context_id` parameter:
+
+```http
+GET /api/cvps/products?context_id=1
+GET /api/cvps/homepage?context_id=2
+GET /api/cvps/categories?context_id=3
+```
+
+### Context ID Parameter
+
+**Parameter**: `context_id` (optional query parameter)
+- **Type**: Integer
+- **Default**: 1 (Latitude36)
+- **Range**: 1 to N (where N = number of active contexts)
+- **Purpose**: Isolates data to specific website/brand
+
+### Usage
+
+**Frontend Detection** (Recommended):
+```javascript
+// Domain-based context detection
+const getContextId = () => {
+  const hostname = window.location.hostname;
+  const SITE_CONFIG = {
+    'staging.latitude36.com.au': 1,
+    'dropship.example.com': 2,
+    'directory.example.com': 3
+  };
+  return SITE_CONFIG[hostname] || 1;
+};
+
+// Add to all API calls
+const contextId = getContextId();
+fetch(`${API_URL}/api/cvps/products?context_id=${contextId}`);
+```
+
+**Manual Override** (Testing/Admin):
+```http
+GET /api/cvps/products?context_id=2
+```
+
+### Context Isolation
+
+Each context has **completely isolated** data:
+- Products, categories, galleries
+- Customers, orders, reviews
+- Content, blog posts, media
+- Marketing campaigns, newsletters
+- All site-specific information
+
+**Example**:
+```http
+GET /api/cvps/products?context_id=1  → Returns 50 Latitude36 products
+GET /api/cvps/products?context_id=2  → Returns 0 products (different site)
+```
+
+### Database Architecture
+
+**Migration v102 + v103** (Completed 2025-10-12):
+- **114 tables** with context_id isolation
+- **117 indexes** for performance (idx_{table}_context)
+- **112 FK constraints** to business_contexts table
+- **2,694 rows** backfilled to context_id=1 (Latitude36)
+- **Database version**: 103
+
+### Implementation Status
+
+**✅ Complete**:
+- Database schema with context_id columns
+- Performance indexes on all context_id columns
+- FK constraints for referential integrity
+- All existing data backfilled to context_id=1
+
+**🟡 In Progress**:
+- Backend aggregators (Phase 2)
+- CVPS processor routes (Phase 3)
+- MVPS management routes (Phase 3)
+
+**⏳ Pending**:
+- Frontend domain detection (Phase 4)
+- Traefik multi-domain routing (Phase 5)
+
+### Business Contexts Registry
+
+All contexts are registered in the `business_contexts` table:
+
+| ID | Business Name | Domain | Status |
+|----|---------------|--------|--------|
+| 1 | Latitude 36 | staging.latitude36.com.au | Active |
+| 2 | Dropship Site | dropship.example.com | Future |
+| 3 | Directory | directory.example.com | Future |
+
+### Migration Information
+
+- **Migration v102**: Added context_id to products, categories, galleries + AI-SEO fields
+- **Migration v103**: Added context_id to 106 additional tables (customers, orders, reviews, etc.)
+- **Documentation**: `/docs/MULTI_TENANT_ARCHITECTURE.md`
+- **ZEN Project**: `/multi-tenant/zen/project-plan.md`
+
 ## Response Format
 
 All endpoints return consistent JSON responses:
