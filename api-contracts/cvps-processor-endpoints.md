@@ -5,21 +5,23 @@ Last Updated: 2025-10-06
 
 ## Overview
 
-The CVPS Processor provides **22 optimized endpoints** (18 public content + 4 wholesale) that consolidate data from multiple sources into single, efficient API calls. These endpoints are designed specifically for the Customer-facing VPS (CVPS) frontend, deployed across staging and production environments.
+The CVPS Processor provides **24 optimized endpoints** (20 public content + 4 wholesale) that consolidate data from multiple sources into single, efficient API calls. These endpoints are designed specifically for the Customer-facing VPS (CVPS) frontend, deployed across staging and production environments.
 
 ### Version 4.1 Breaking Changes
 - **AUTHENTICATION REMOVED**: Most endpoints are now PUBLIC (no API key required)
-- **New Endpoints**: Added shipping, business-info, and address validation
+- **New Endpoints**: Added shipping, business-info, address validation, bestsellers, and site-config
 - **Wholesale Module**: Separate authenticated endpoints for B2B customers
-- **Total Endpoints**: Increased from 15 to 22
+- **Total Endpoints**: Increased from 15 to 24
 
 ## Authentication
 
 ### Public Endpoints (No Authentication Required)
-The following 18 endpoints are completely public and require NO authentication headers:
+The following 20 endpoints are completely public and require NO authentication headers:
 - All content endpoints (homepage, products, blog, etc.)
 - Shipping information
 - Business information
+- Site configuration
+- Best-selling products
 - Address validation
 - Health check
 
@@ -45,9 +47,9 @@ Where `{BASE_URL}` is the environment-specific MVPS domain:
 
 ## Multi-Tenant Support 🆕
 
-**Status**: Database Ready (Phase 1 Complete), Backend Implementation Pending (Phase 2-3)
+**Status**: ✅ **COMPLETE for Public Routes** (20/20), ⚠️ **IN PROGRESS for Wholesale Routes** (0/4)
 
-All CVPS endpoints support multi-tenant isolation via the `context_id` parameter:
+All CVPS public endpoints fully support multi-tenant isolation via the `context_id` parameter:
 
 ```http
 GET /api/cvps/products?context_id=1
@@ -115,14 +117,15 @@ GET /api/cvps/products?context_id=2  → Returns 0 products (different site)
 ### Implementation Status
 
 **✅ Complete**:
-- Database schema with context_id columns
-- Performance indexes on all context_id columns
-- FK constraints for referential integrity
-- All existing data backfilled to context_id=1
+- Database schema with context_id columns (114 tables)
+- Performance indexes on all context_id columns (117 indexes)
+- FK constraints for referential integrity (112 constraints)
+- All existing data backfilled to context_id=1 (2,694 rows)
+- **Public CVPS routes** - All 20 public endpoints support context_id
+- **Backend aggregators** - All public aggregators context-aware
 
 **🟡 In Progress**:
-- Backend aggregators (Phase 2)
-- CVPS processor routes (Phase 3)
+- **Wholesale CVPS routes** - Context_id extraction from JWT pending
 - MVPS management routes (Phase 3)
 
 **⏳ Pending**:
@@ -182,7 +185,7 @@ All endpoints implement intelligent caching with appropriate TTLs:
 - **Shipping**: 24 hours
 - **Business Info**: 24 hours
 
-## Public Content Endpoints (18)
+## Public Content Endpoints (20)
 
 ### 1. Health Check
 ```http
@@ -202,7 +205,7 @@ GET /health
     "misses": 1
   },
   "version": "2.0",
-  "endpoints_available": 22,
+  "endpoints_available": 24,
   "features": [
     "product_tagging",
     "enhanced_search",
@@ -450,7 +453,92 @@ GET /business-info
 }
 ```
 
-### 18. Address Validation ⭐ NEW
+### 18. Best-Selling Products ⭐ NEW
+```http
+GET /bestsellers
+```
+
+**Query Parameters:**
+- `context_id`: Business context ID (default: 1)
+- `period`: Time period (default: "30d")
+  - `1d`: Last 24 hours
+  - `7d`: Last 7 days
+  - `30d`: Last 30 days
+  - `90d`: Last 90 days
+  - `all`: All time
+- `limit`: Number of products (default: 10, max: 50)
+
+**Response:**
+```json
+{
+  "success": true,
+  "products": [
+    {
+      "id": 1,
+      "name": "Pure Kangaroo Island Honey",
+      "slug": "pure-kangaroo-island-honey",
+      "price": {"website": 15.50},
+      "images": {
+        "main": {"url": "/media/products/honey-main.jpg", "alt": "Main product image"}
+      },
+      "salesCount": 156,
+      "revenue": 2418.00
+    }
+  ],
+  "period": "30d",
+  "cached_at": "2025-10-17T08:00:00.000Z"
+}
+```
+
+**Cache TTL**: 30 minutes
+
+### 19. Site Configuration ⭐ NEW
+```http
+GET /site-config
+```
+
+**Query Parameters:**
+- `context_id`: Business context ID (default: 1)
+
+**Response:**
+```json
+{
+  "success": true,
+  "config": {
+    "branding": {
+      "logoUrl": "/media/branding/logo.svg",
+      "primaryColor": "#FFB800",
+      "secondaryColor": "#2C3E50",
+      "fontFamily": "Inter, sans-serif"
+    },
+    "theme": {
+      "mode": "light",
+      "layout": "standard"
+    },
+    "navigation": {
+      "menuItems": [
+        {"label": "Home", "url": "/", "order": 1},
+        {"label": "Shop", "url": "/shop", "order": 2}
+      ]
+    },
+    "features": {
+      "enableWholesale": true,
+      "enableBlog": true,
+      "enableGalleries": true
+    },
+    "seo": {
+      "siteName": "Latitude 36",
+      "defaultTitle": "Pure Honey from Kangaroo Island",
+      "defaultDescription": "Sustainable beekeeping..."
+    }
+  },
+  "cached_at": "2025-10-17T08:00:00.000Z"
+}
+```
+
+**Cache TTL**: 30 minutes
+
+### 20. Address Validation ⭐ NEW
 ```http
 POST /address/validate
 ```
@@ -486,11 +574,23 @@ POST /address/validate
 
 All wholesale endpoints require JWT authentication and are prefixed with `/api/cvps/wholesale/`
 
+⚠️ **MULTI-TENANT SECURITY UPDATE (2025-10-17)**:
+Wholesale endpoints now support `context_id` parameter for multi-tenant isolation. However, automatic context extraction from JWT is pending implementation.
+
+**Current Behavior**:
+- `context_id` can be passed as query parameter (defaults to 1)
+- Full JWT-based context isolation coming soon
+
+**Recommendation**: Only create wholesale customers in Context 1 until JWT extraction is complete.
+
 ### W1. Wholesale Product Catalog
 ```http
 GET /api/cvps/wholesale/products
 Authorization: Bearer {jwt_token}
 ```
+
+**Query Parameters:**
+- `context_id`: Business context ID (optional, default: 1)
 
 Returns products with wholesale pricing, minimum order quantities, and bulk discounts.
 
@@ -500,6 +600,12 @@ GET /api/cvps/wholesale/products/search
 Authorization: Bearer {jwt_token}
 ```
 
+**Query Parameters:**
+- `q`: Search query
+- `category`: Category filter
+- `min_price`, `max_price`: Price range filters
+- `context_id`: Business context ID (optional, default: 1)
+
 Enhanced search with wholesale-specific filters and pricing tiers.
 
 ### W3. Wholesale Product Detail
@@ -508,6 +614,9 @@ GET /api/cvps/wholesale/products/{id}
 Authorization: Bearer {jwt_token}
 ```
 
+**Query Parameters:**
+- `context_id`: Business context ID (optional, default: 1)
+
 Detailed product information including volume pricing breaks.
 
 ### W4. Wholesale Categories
@@ -515,6 +624,9 @@ Detailed product information including volume pricing breaks.
 GET /api/cvps/wholesale/categories
 Authorization: Bearer {jwt_token}
 ```
+
+**Query Parameters:**
+- `context_id`: Business context ID (optional, default: 1)
 
 Categories with wholesale product counts and B2B-specific information.
 
@@ -612,14 +724,18 @@ Products include comprehensive tagging data:
 
 ## Version History
 
-### Version 4.1 (2025-10-06)
+### Version 4.1 (2025-10-06, Updated 2025-10-17)
 - 🔴 **BREAKING**: Removed API key requirement for public endpoints
 - ✅ Added shipping endpoint (`/shipping`)
 - ✅ Added business information endpoint (`/business-info`)
+- ✅ Added bestsellers endpoint (`/bestsellers`) - NEW
+- ✅ Added site configuration endpoint (`/site-config`) - NEW
 - ✅ Added address validation endpoint (`/address/validate`)
 - ✅ Added wholesale module with 4 B2B endpoints
-- ✅ Total endpoints increased to 22 (18 public + 4 wholesale)
+- ✅ Total endpoints increased to 24 (20 public + 4 wholesale)
 - ✅ Implemented JWT authentication for wholesale endpoints only
+- ✅ Full multi-tenant support for all public endpoints
+- ⚠️ Multi-tenant support for wholesale endpoints (query param, JWT pending)
 
 ### Version 3.1 (2025-08-05)
 - ✅ Added enhanced product search endpoint (`/products/search`)
@@ -646,5 +762,6 @@ Products include comprehensive tagging data:
 
 **Generated by**: MVPS-CVPS Management Agent
 **Documentation Status**: ✅ CURRENT - Version 4.1 fully operational
-**Last Validation**: 2025-10-06 12:30:00 UTC
-**Total Endpoints**: 22 (18 public + 4 wholesale)
+**Last Updated**: 2025-10-17 (Multi-tenant updates)
+**Last Validation**: 2025-10-17 08:00:00 UTC
+**Total Endpoints**: 24 (20 public + 4 wholesale)
