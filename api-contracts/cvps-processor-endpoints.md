@@ -1,22 +1,35 @@
-# CVPS Processor API Endpoints Specification
+# CVPS Service API Endpoints Specification
 
-Version: 4.1 - Public Access Architecture
-Last Updated: 2025-10-06
+Version: 4.2 - Standalone Microservice Architecture
+Last Updated: 2025-11-22
 
 ## Overview
 
-The CVPS Processor provides **24 optimized endpoints** (20 public content + 4 wholesale) that consolidate data from multiple sources into single, efficient API calls. These endpoints are designed specifically for the Customer-facing VPS (CVPS) frontend, deployed across staging and production environments.
+The CVPS Service provides **33 optimized endpoints** (29 public content + 4 wholesale) that consolidate data from multiple sources into single, efficient API calls. These endpoints are designed specifically for the Customer-facing VPS (CVPS) frontend, deployed across staging and production environments.
 
-### Version 4.1 Breaking Changes
+### Architectural Change (November 2025)
+**CRITICAL**: CVPS is now a **standalone microservice** (extracted from backend on Nov 9, 2025)
+- **Service Location**: `/home/admin/l36/cvps-service/`
+- **Docker Container**: cvps-service (port 5051 production, 5054 staging)
+- **Benefit**: Zero-downtime deployments (backend restarts don't affect customer website)
+- **Routing**: Traefik routes `/api/cvps/*` to cvps-service
+
+### Version 4.2 Changes (November 2025)
+- **New Endpoints**: Added AI data endpoints (6), CMS pages (2), discount validation (1)
+- **Total Endpoints**: Increased from 24 to 33
+- **Version 4.1**: Had 24 endpoints (20 public + 4 wholesale)
+- **Version 4.2**: Has 33 endpoints (29 public + 4 wholesale)
+
+### Version 4.1 Changes (October 2025)
 - **AUTHENTICATION REMOVED**: Most endpoints are now PUBLIC (no API key required)
-- **New Endpoints**: Added shipping, business-info, address validation, bestsellers, and site-config
+- **New Endpoints**: Added shipping, business-info, address validation, bestsellers, site-config
 - **Wholesale Module**: Separate authenticated endpoints for B2B customers
 - **Total Endpoints**: Increased from 15 to 24
 
 ## Authentication
 
 ### Public Endpoints (No Authentication Required)
-The following 20 endpoints are completely public and require NO authentication headers:
+The following 29 endpoints are completely public and require NO authentication headers:
 - All content endpoints (homepage, products, blog, etc.)
 - Shipping information
 - Business information
