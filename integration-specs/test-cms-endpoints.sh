@@ -21,7 +21,7 @@ case $ENV in
         API_KEY="l36-cms-dev-2025"
         ;;
     dev)
-        BASE_URL="https://api-dev.latitude36.com.au"
+        BASE_URL="https://api-latitude36.com.au"
         API_KEY="l36-cms-dev-2025"
         ;;
     prod)

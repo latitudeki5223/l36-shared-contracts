@@ -9,7 +9,7 @@ This guide explains how the L36 Commerce and CMS API systems are organized and h
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                         CVPS Frontend                         │
-│                   (dev.latitude36.com.au)                    │
+│                   (latitude36.com.au)                    │
 └─────────────────────┬───────────────────────────────────────┘
                       │ Uses TypeScript Types
                       ▼
@@ -302,7 +302,7 @@ Version in URL is optional:
 ### 2. CORS Issues
 Allowed origins:
 - `http://localhost:3000` (development)
-- `https://dev.latitude36.com.au` (staging)
+- `https://latitude36.com.au` (staging)
 - `https://latitude36.com.au` (production)
 
 ### 3. Rate Limiting

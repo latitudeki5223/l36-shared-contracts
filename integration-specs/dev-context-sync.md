@@ -9,7 +9,7 @@
 - **Status**: FULLY OPERATIONAL
 - **Endpoints**: 8 GET-only endpoints at `/api/cvps/*`
 - **Authentication**: 
-  - Dev: `X-API-Key: cvps-dev-key-2025`, `X-Site-ID: dev.latitude36.com.au`
+  - Dev: `X-API-Key: cvps-dev-key-2025`, `X-Site-ID: latitude36.com.au`
   - Prod: `X-API-Key: cvps-prod-key-2025`, `X-Site-ID: latitude36.com.au`
 
 #### Working Endpoints
@@ -24,15 +24,15 @@
 
 ### Frontend Configuration
 
-#### CVPS Frontend (dev.latitude36.com.au)
+#### CVPS Frontend (latitude36.com.au)
 - **VITE_USE_CVPS_PROCESSOR**: `true`
-- **API Gateway**: `https://api.dev.latitude36.com.au`
+- **API Gateway**: `https://api.latitude36.com.au`
 - **Direct Backend**: `http://localhost:5050` (local dev only)
 
 #### Media URL Strategy
 - All media URLs returned as relative paths: `/media/...`
 - Frontend constructs full URLs based on environment
-- Dev: `https://api.dev.latitude36.com.au/media/...`
+- Dev: `https://api.latitude36.com.au/media/...`
 - Prod: `https://l36.com.au/media/...`
 
 ### Testing
@@ -43,7 +43,7 @@
 Usage:
 ```bash
 ./test-cvps-endpoints.sh local  # Test localhost:5050
-./test-cvps-endpoints.sh dev    # Test dev.latitude36.com.au
+./test-cvps-endpoints.sh dev    # Test latitude36.com.au
 ./test-cvps-endpoints.sh prod   # Test production
 ```
 

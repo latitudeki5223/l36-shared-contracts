@@ -51,8 +51,8 @@ POST /api/create-checkout-session
 ```json
 {
   "items": [...],
-  "success_url": "https://dev.latitude36.com.au/success",
-  "cancel_url": "https://dev.latitude36.com.au/cart"
+  "success_url": "https://latitude36.com.au/success",
+  "cancel_url": "https://latitude36.com.au/cart"
 }
 ```
 

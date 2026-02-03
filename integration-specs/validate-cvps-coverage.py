@@ -49,11 +49,11 @@ def main():
     if env == 'local':
         base_url = 'http://localhost:5050'
         api_key = 'cvps-dev-key-2025'
-        site_id = 'dev.latitude36.com.au'
+        site_id = 'latitude36.com.au'
     elif env == 'dev':
-        base_url = 'https://api.dev.latitude36.com.au'
+        base_url = 'https://api.latitude36.com.au'
         api_key = 'cvps-dev-key-2025'
-        site_id = 'dev.latitude36.com.au'
+        site_id = 'latitude36.com.au'
     elif env == 'prod':
         base_url = 'https://l36.com.au'
         api_key = 'cvps-prod-key-2025'

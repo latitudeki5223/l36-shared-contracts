@@ -22,12 +22,12 @@ case "$ENV" in
     local)
         BASE_URL="http://localhost:5050/api/cvps"
         API_KEY="cvps-dev-key-2025"
-        SITE_ID="dev.latitude36.com.au"
+        SITE_ID="latitude36.com.au"
         ;;
     dev)
-        BASE_URL="https://api.dev.latitude36.com.au/api/cvps"
+        BASE_URL="https://api.latitude36.com.au/api/cvps"
         API_KEY="cvps-dev-key-2025"
-        SITE_ID="dev.latitude36.com.au"
+        SITE_ID="latitude36.com.au"
         ;;
     prod)
         BASE_URL="https://l36.com.au/api/cvps"

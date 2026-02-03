@@ -166,8 +166,8 @@ X-API-Key: l36-cms-dev-2025
   ],
   "email": "customer@example.com",
   "payment_method": "stripe",
-  "success_url": "https://dev.latitude36.com.au/success",
-  "cancel_url": "https://dev.latitude36.com.au/cancel"
+  "success_url": "https://latitude36.com.au/success",
+  "cancel_url": "https://latitude36.com.au/cancel"
 }
 ```
 

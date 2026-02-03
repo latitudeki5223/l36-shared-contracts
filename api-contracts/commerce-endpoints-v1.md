@@ -167,7 +167,7 @@ Version changes follow semantic versioning:
 ## Security Considerations
 
 1. **HTTPS Required**: All production endpoints require HTTPS
-2. **CORS**: Configured for `dev.latitude36.com.au` and `latitude36.com.au`
+2. **CORS**: Configured for `latitude36.com.au` and `latitude36.com.au`
 3. **Input Validation**: All inputs sanitized and validated
 4. **SQL Injection**: Parameterized queries only
 5. **XSS Protection**: Output encoding on all responses

@@ -56,7 +56,7 @@ curl -X GET http://localhost:5050/api/dev/context/sync-status \
 # Test specific endpoint
 curl -X GET http://localhost:5050/api/cvps/homepage \
   -H "X-API-Key: cvps-dev-key-2025" \
-  -H "X-Site-ID: dev.latitude36.com.au"
+  -H "X-Site-ID: latitude36.com.au"
 ```
 
 ## Maintenance Procedures
@@ -109,14 +109,14 @@ cd /home/admin/l36/shared-contracts
 
 ### For CVPS (Customer VPS)
 - Frontend configuration: `VITE_USE_CVPS_PROCESSOR=true`
-- API gateway: `https://api.dev.latitude36.com.au`
+- API gateway: `https://api.latitude36.com.au`
 - Shared contracts: Pull from GitHub repo
 
 ## Troubleshooting
 
 ### Issue: Endpoints returning 401
 - Verify API key matches: `cvps-dev-key-2025` (dev) or `cvps-prod-key-2025` (prod)
-- Check Site-ID header: `dev.latitude36.com.au` (dev) or `latitude36.com.au` (prod)
+- Check Site-ID header: `latitude36.com.au` (dev) or `latitude36.com.au` (prod)
 
 ### Issue: Endpoints returning 405
 - All endpoints are GET-only
@@ -131,12 +131,12 @@ cd /home/admin/l36/shared-contracts
 ### Authentication Headers
 ```http
 X-API-Key: cvps-dev-key-2025
-X-Site-ID: dev.latitude36.com.au
+X-Site-ID: latitude36.com.au
 ```
 
 ### Base URLs
 - Local: `http://localhost:5050/api/cvps`
-- Development: `https://api.dev.latitude36.com.au/api/cvps`
+- Development: `https://api.latitude36.com.au/api/cvps`
 - Production: `https://l36.com.au/api/cvps`
 
 ### Response Format

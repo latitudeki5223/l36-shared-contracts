@@ -51,7 +51,7 @@ cd l36-shared-contracts
 All endpoints require:
 ```http
 X-API-Key: cvps-dev-key-2025      # Development
-X-Site-ID: dev.latitude36.com.au  # Development
+X-Site-ID: latitude36.com.au  # Development
 ```
 
 ## Available Endpoints

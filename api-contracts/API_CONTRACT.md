@@ -13,7 +13,7 @@ All API requests require authentication headers:
 
 ```http
 X-API-Key: cvps-dev-key-2025
-X-Site-ID: dev.latitude36.com.au
+X-Site-ID: latitude36.com.au
 ```
 
 Production:
@@ -27,7 +27,7 @@ X-Site-ID: latitude36.com.au
 ## Base URLs
 
 - **Local Development**: `http://localhost:5050/api/cvps`
-- **Development**: `https://api.dev.latitude36.com.au/api/cvps`
+- **Development**: `https://api.latitude36.com.au/api/cvps`
 - **Production**: `https://l36.com.au/api/cvps`
 
 ---
@@ -74,7 +74,7 @@ Error responses:
 ## Media URLs
 
 All media URLs are relative paths (`/media/...`). Frontend constructs full URLs:
-- Development: `https://api.dev.latitude36.com.au/media/...`
+- Development: `https://api.latitude36.com.au/media/...`
 - Production: `https://l36.com.au/media/...`
 
 ---

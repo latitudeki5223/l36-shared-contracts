@@ -5,7 +5,7 @@
  * Last Updated: 2025-01-22
  * 
  * These types define the complete API contract between MVPS CVPS Processor
- * and the CVPS frontend at dev.latitude36.com.au
+ * and the CVPS frontend at latitude36.com.au
  */
 
 // ===== COMMON TYPES =====
@@ -625,7 +625,7 @@ export const DEFAULT_CVPS_CONFIG: CVPSEnvironmentConfig = {
   apiBaseUrl: 'http://localhost:5050/api/cvps',
   mediaBaseUrl: 'http://localhost:5050',
   apiKey: 'cvps-dev-key-2025',
-  siteId: 'dev.latitude36.com.au',
+  siteId: 'latitude36.com.au',
   cacheTimeout: 300000, // 5 minutes
   retryAttempts: 3
 };
