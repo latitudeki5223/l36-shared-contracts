@@ -543,7 +543,13 @@ GET /site-config
       "siteName": "Latitude 36",
       "defaultTitle": "Pure Honey from Kangaroo Island",
       "defaultDescription": "Sustainable beekeeping..."
-    }
+    },
+    "trustSignals": [
+      {"icon": "bee", "text": "Handcrafted on Kangaroo Island", "sort_order": 0},
+      {"icon": "leaf", "text": "No Artificial Flavours or Preservatives", "sort_order": 1},
+      {"icon": "heart", "text": "Pure Ligurian Honey Since 2018", "sort_order": 3},
+      {"icon": "truck", "text": "$17 Flat Rate Shipping Australia-Wide", "sort_order": 99}
+    ]
   },
   "cached_at": "2025-10-17T08:00:00.000Z"
 }
