@@ -1,30 +1,35 @@
 # CVPS Service API Endpoints Specification
 
-Version: 4.2 - Standalone Microservice Architecture
-Last Updated: 2025-11-22
+Version: 5.0 - Post-Drift Resync
+Last Updated: 2026-05-02
 
 ## Overview
 
-The CVPS Service provides **33 optimized endpoints** (29 public content + 4 wholesale) that consolidate data from multiple sources into single, efficient API calls. These endpoints are designed specifically for the Customer-facing VPS (CVPS) frontend, deployed across staging and production environments.
+The CVPS Service exposes **57 endpoints** across 6 blueprints. The "33 endpoints" figure from v4.2 was correct at extraction but drifted as recipes, reviews, digital products, and other features were added without contract updates. This document is the authoritative count and is enforced by `scripts/validators/check-component-contract.sh`.
 
-### Architectural Change (November 2025)
-**CRITICAL**: CVPS is now a **standalone microservice** (extracted from backend on Nov 9, 2025)
+### Endpoint count by blueprint (live)
+
+| Blueprint | File | Routes |
+|---|---|---|
+| `cvps_bp` | `app/routes/cvps_routes.py` | 32 |
+| `recipe_bp` | `app/routes/recipe_routes.py` | 11 |
+| `review_bp` | `app/routes/review_routes.py` | 5 |
+| `wholesale_bp` | `app/routes/wholesale_routes.py` | 4 |
+| `digital_products_bp` | `app/routes/digital_product_routes.py` | 3 |
+| `health_bp` | `app/routes/health_routes.py` | 2 |
+| **Total** | | **57** |
+
+### Architectural Context (November 2025)
+**CRITICAL**: CVPS is a **standalone microservice** (extracted from backend on Nov 9, 2025)
 - **Service Location**: `/home/admin/l36/cvps-service/`
 - **Docker Container**: cvps-service (port 5051 production, 5054 staging)
 - **Benefit**: Zero-downtime deployments (backend restarts don't affect customer website)
 - **Routing**: Traefik routes `/api/cvps/*` to cvps-service
 
-### Version 4.2 Changes (November 2025)
-- **New Endpoints**: Added AI data endpoints (6), CMS pages (2), discount validation (1)
-- **Total Endpoints**: Increased from 24 to 33
-- **Version 4.1**: Had 24 endpoints (20 public + 4 wholesale)
-- **Version 4.2**: Has 33 endpoints (29 public + 4 wholesale)
-
-### Version 4.1 Changes (October 2025)
-- **AUTHENTICATION REMOVED**: Most endpoints are now PUBLIC (no API key required)
-- **New Endpoints**: Added shipping, business-info, address validation, bestsellers, site-config
-- **Wholesale Module**: Separate authenticated endpoints for B2B customers
-- **Total Endpoints**: Increased from 15 to 24
+### Version history
+- **v5.0 (May 2026)** — drift resync to 57 endpoints; contract validator wired into pre-commit
+- **v4.2 (Nov 2025)** — claimed 33 endpoints; recipe/review/digital-product blueprints added without contract update
+- **v4.1 (Oct 2025)** — 24 endpoints (20 public + 4 wholesale) before extraction
 
 ## Authentication
 
@@ -242,12 +247,12 @@ GET /shipping
 {
   "success": true,
   "shipping": {
-    "cost": 15.00,
+    "cost": 17.00,
     "currency": "AUD",
     "method": "Standard Shipping",
     "estimated_days": "3-7 business days",
-    "free_shipping_threshold": 100.00,
-    "notes": "Free shipping on orders over $100"
+    "free_shipping_threshold": 150.00,
+    "notes": "Free shipping on orders over $150"
   },
   "cached_at": "2025-10-06T08:59:00.000Z"
 }
