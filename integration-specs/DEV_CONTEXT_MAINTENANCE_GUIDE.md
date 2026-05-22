@@ -104,7 +104,7 @@ cd /home/admin/l36/shared-contracts
 
 ### For MVPS (Management VPS)
 - Backend implementation: `/home/admin/l36/backend/app/cvps_processor/`
-- Technical docs: `/home/admin/l36/docs/CVPS_PROCESSOR_TECHNICAL_DOCUMENTATION.md`
+- Technical docs: `/home/admin/l36/shared-contracts/api-contracts/cvps-processor-endpoints.md`
 - API endpoints: `http://localhost:5050/api/cvps/*`
 
 ### For CVPS (Customer VPS)
