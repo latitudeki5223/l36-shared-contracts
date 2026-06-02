@@ -1,6 +1,6 @@
 # MVPS → CVPS Component Contract
 
-**Version**: 1.0
+**Version**: 1.2
 **Created**: 2026-03-27
 **Purpose**: Rules for creating new section types that CVPS can render
 
@@ -336,6 +336,6 @@ See `frontend-nextjs/components/section-config/registry.tsx` for the full list.
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0 | 2026-03-27 | Initial contract — 33 universal components |
-| 1.1 | 2026-03-29 | (removed — fuelwatch components deprecated) |
-| 1.2 | 2026-04-04 | Removed fuelwatch components (project discontinued) |
+| 1.0 | 2026-03-27 | Initial contract — 33 universal + 9 fuelwatch components |
+| 1.1 | 2026-03-29 | Added fuelwatch_report_archive (10 fuelwatch / 43 total) |
+| 1.2 | 2026-04-04 | Removed fuelwatch components (project discontinued) — 33 universal |
