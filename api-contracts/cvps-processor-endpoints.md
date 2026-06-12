@@ -5,19 +5,19 @@ Last Updated: 2026-05-02
 
 ## Overview
 
-The CVPS Service exposes **57 endpoints** across 6 blueprints. The "33 endpoints" figure from v4.2 was correct at extraction but drifted as recipes, reviews, digital products, and other features were added without contract updates. This document is the authoritative count and is enforced by `scripts/validators/check-component-contract.sh`.
+The CVPS Service exposes **58 endpoints** across 6 blueprints. The "33 endpoints" figure from v4.2 was correct at extraction but drifted as recipes, reviews, digital products, and other features were added without contract updates. This document is the authoritative count and is enforced by `scripts/validators/check-component-contract.sh`.
 
 ### Endpoint count by blueprint (live)
 
 | Blueprint | File | Routes |
 |---|---|---|
-| `cvps_bp` | `app/routes/cvps_routes.py` | 32 |
+| `cvps_bp` | `app/routes/cvps_routes.py` | 33 |
 | `recipe_bp` | `app/routes/recipe_routes.py` | 11 |
 | `review_bp` | `app/routes/review_routes.py` | 5 |
 | `wholesale_bp` | `app/routes/wholesale_routes.py` | 4 |
 | `digital_products_bp` | `app/routes/digital_product_routes.py` | 3 |
 | `health_bp` | `app/routes/health_routes.py` | 2 |
-| **Total** | | **57** |
+| **Total** | | **58** |
 
 ### Architectural Context (November 2025)
 **CRITICAL**: CVPS is a **standalone microservice** (extracted from backend on Nov 9, 2025)
@@ -591,6 +591,30 @@ POST /address/validate
   },
   "suggestions": [],
   "delivery_point_id": "12345678"
+}
+```
+
+### 21. Published Pages List (2026-06-12)
+```http
+GET /pages?context_id={id}&limit=100&offset=0
+```
+
+Lists published Puck pages for a context. Consumed by the Next.js storefront
+sitemap (`fetchAvailablePages` in `lib/api/mvpsPageApi.ts`). Cache: 30 min.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "pages": [
+      { "id": 1, "slug": "about", "title": "About Us", "description": "...", "published_at": "...", "updated_at": "..." }
+    ],
+    "total": 1,
+    "limit": 100,
+    "offset": 0
+  },
+  "cached_at": "2026-06-12T10:00:00Z"
 }
 ```
 
