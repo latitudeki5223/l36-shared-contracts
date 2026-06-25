@@ -7,6 +7,8 @@ Last Updated: 2026-05-02
 
 The CVPS Service exposes **58 endpoints** across 6 blueprints. The "33 endpoints" figure from v4.2 was correct at extraction but drifted as recipes, reviews, digital products, and other features were added without contract updates. This document is the authoritative count and is enforced by `scripts/validators/check-component-contract.sh`.
 
+> ℹ️ **Endpoints vs component types — do not conflate.** This doc counts **HTTP endpoints (58)**. `COMPONENT_CONTRACT.md` counts **UI section/component types (33)** — a different thing. A "33" you see elsewhere is almost always the component types, not endpoints.
+
 ### Endpoint count by blueprint (live)
 
 | Blueprint | File | Routes |
@@ -27,7 +29,7 @@ The CVPS Service exposes **58 endpoints** across 6 blueprints. The "33 endpoints
 - **Routing**: Traefik routes `/api/cvps/*` to cvps-service
 
 ### Version history
-- **v5.0 (May 2026)** — drift resync to 57 endpoints; contract validator wired into pre-commit
+- **v5.0 (May 2026)** — drift resync to 58 endpoints; contract validator wired into pre-commit
 - **v4.2 (Nov 2025)** — claimed 33 endpoints; recipe/review/digital-product blueprints added without contract update
 - **v4.1 (Oct 2025)** — 24 endpoints (20 public + 4 wholesale) before extraction
 
