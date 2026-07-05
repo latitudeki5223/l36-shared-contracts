@@ -322,7 +322,7 @@ See `frontend-nextjs/components/section-config/registry.tsx` for the full list.
 - `custom_html`, `donation_form`, `live_chat`
 - `gateway_hero`, `category_portals`, `homepage_newsletter`
 
-### Newspaper world (16 components — Latitude 36 1950s second site)
+### Newspaper world (20 components — Latitude 36 1950s second site)
 
 Rendered by `frontend-nextjs/components/sections/newspaper/` inside `NewspaperShell`
 (the printed sheet). Pages whose sections start with `newspaper_` render chrome-free
@@ -348,6 +348,15 @@ Data-driven (live CVPS data at render):
 - `newspaper_recipe_card` — `GET /api/cvps/recipes/featured` with editor fallback copy
 - `newspaper_bottom_row` — composed 4-column band: market + recipe (live) + note + index
 - `newspaper_contact` — "Send Us a Telegram" form posting to `POST /api/cvps/contact`
+- `newspaper_icon_strip` — engraved brand-proof cells: `items[{icon, label, text}]` (icons: sprig|jar|bee|leaf|anchor|star|wheat|gift|hand|sun)
+- `newspaper_category_row` — shop-by-category tiles; live first-product photo per `categorySlug` via the category-detail endpoint
+- `newspaper_feature_band` — editorial text | wide B&W photo | 36° stamp + address column
+- `newspaper_newsletter` — "Stay in Touch" notice posting to `POST /api/cms/marketing/newsletter/subscribe` + pull-quote
+
+v2 restyle (2026-07-05): aged tan paper + tattered sheet + printed double-rule frame
+(`NewspaperShell`); product cards render in FULL COLOUR (editorial photos stay sepia
+halftone); `newspaper_ad` gains a `posters[]` retro-advert variant; `newspaper_blog_index`
+gains `variant: band|page`; nav carries a working search into `/shop?search=`.
 
 ---
 
@@ -367,3 +376,4 @@ Data-driven (live CVPS data at render):
 | 1.1 | 2026-03-29 | Added fuelwatch_report_archive (10 fuelwatch / 43 total) |
 | 1.2 | 2026-04-04 | Removed fuelwatch components (project discontinued) — 33 universal |
 | 1.3 | 2026-07-05 | Added newspaper world family (16 `newspaper_*` components) for the Latitude 36 1950s second site — 49 total |
+| 1.4 | 2026-07-05 | Newspaper v2 old-school restyle: +`newspaper_icon_strip`, `newspaper_category_row`, `newspaper_feature_band`, `newspaper_newsletter` (20 newspaper / 53 total); aged tattered sheet, colour product cards, poster ads |
