@@ -322,6 +322,33 @@ See `frontend-nextjs/components/section-config/registry.tsx` for the full list.
 - `custom_html`, `donation_form`, `live_chat`
 - `gateway_hero`, `category_portals`, `homepage_newsletter`
 
+### Newspaper world (16 components — Latitude 36 1950s second site)
+
+Rendered by `frontend-nextjs/components/sections/newspaper/` inside `NewspaperShell`
+(the printed sheet). Pages whose sections start with `newspaper_` render chrome-free
+(no modern header/footer) and suppress the catch-all title band. Styling lives in
+`newspaper.css` (BEM, locked press decisions from crystal 2026-04-23).
+
+Static (props-driven):
+- `newspaper_masthead` — utility strip, weather box (placeholder feed), nameplate, live date/edition box
+- `newspaper_nav` — printed directory row; `items[{label, href}]`; active link accent
+- `newspaper_headline` — `heading`, `subheading`
+- `newspaper_column_note` — `variant: note|farm`, `title`, `icon`, `items[{lead, text}]`, `signature`, `ctaLabel/Href`, `imageUrl/Alt`
+- `newspaper_market_roundup` — `heading`, `rows[{label, value}]`, `note` (saleyard feed deferred)
+- `newspaper_toc` — `heading`, `items[{label, page, href}]`
+- `newspaper_ad` — typographic house ad: `kicker`, `title`, `body`, `ctaLabel/Href`
+- `newspaper_story` — long-form editorial: `kicker`, `title`, `lede`, `imageUrl/Alt/Caption`, `paragraphs[{text}]`, `pullQuote`, `signature`
+- `newspaper_footer` — `tagline`, `links[{label, href}]`, `imprint`, auto year
+
+Data-driven (live CVPS data at render):
+- `newspaper_lead_story` — latest published blog (or `pinnedSlug`) via `GET /api/cvps/blog`; optional built-in aside column
+- `newspaper_product_row` — `dataSource: bestsellers|category` via `GET /api/cvps/bestsellers` / `/products?category=`; sepia halftone, colour on hover, links to `/product/{slug}`
+- `newspaper_product_grid` — classified-notice catalogue grid via `GET /api/cvps/products`; `category`, `limit`; price always visible
+- `newspaper_blog_index` — journal page feed via `GET /api/cvps/blog`; feature + column items
+- `newspaper_recipe_card` — `GET /api/cvps/recipes/featured` with editor fallback copy
+- `newspaper_bottom_row` — composed 4-column band: market + recipe (live) + note + index
+- `newspaper_contact` — "Send Us a Telegram" form posting to `POST /api/cvps/contact`
+
 ---
 
 ## Related Documentation
@@ -339,3 +366,4 @@ See `frontend-nextjs/components/section-config/registry.tsx` for the full list.
 | 1.0 | 2026-03-27 | Initial contract — 33 universal + 9 fuelwatch components |
 | 1.1 | 2026-03-29 | Added fuelwatch_report_archive (10 fuelwatch / 43 total) |
 | 1.2 | 2026-04-04 | Removed fuelwatch components (project discontinued) — 33 universal |
+| 1.3 | 2026-07-05 | Added newspaper world family (16 `newspaper_*` components) for the Latitude 36 1950s second site — 49 total |
