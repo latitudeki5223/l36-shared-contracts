@@ -620,6 +620,31 @@ sitemap (`fetchAvailablePages` in `lib/api/mvpsPageApi.ts`). Cache: 30 min.
 }
 ```
 
+### 22. Context Resolution (2026-08-29)
+```http
+GET /resolve-context?host={hostname}
+```
+
+Public, no auth. Resolves a Host header value to its tenant: normalizes the
+host (lowercase, strips port, trailing dot, leading `www.`), then exact-matches
+against active `business_contexts.domain` (host-only — path-based
+pseudo-domains like `www.latitude36.com.au/kk` never match). Cache: 60 seconds.
+Consumed by the Next.js storefront to resolve tenants dynamically (replaces the
+static `DOMAIN_MAP`).
+
+**Response (200):**
+```json
+{
+  "context_id": 1,
+  "business_name": "Latitude 36",
+  "domain": "latitude36.com.au"
+}
+```
+
+**Error Responses:**
+- `404` — unknown host: `{ "error": "...", "host": "..." }`
+- `400` — missing or invalid `host` parameter
+
 ## Wholesale Endpoints (4) - JWT Required
 
 All wholesale endpoints require JWT authentication and are prefixed with `/api/cvps/wholesale/`
