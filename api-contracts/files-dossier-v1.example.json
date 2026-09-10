@@ -1,0 +1,135 @@
+{
+  "contract": "files-dossier/1.0",
+  "dossier_id": "af-wool-001",
+  "revision": 1,
+  "brand": "theaustraliafiles",
+  "file_number": "001",
+  "category": "industry",
+  "story_format": "opening",
+  "subject": "Australian wool — the Reserve Price Scheme and the 1991 collapse",
+  "subject_type": "industry",
+  "title": "White Gold",
+  "target_duration_seconds": 1020,
+  "thesis": "For a century Australia rode on the sheep's back. A government floor price built to protect that fortune became the mechanism of its collapse — a stockpile of millions of bales, a market that stopped buying, and a rural economy remade in a decade.",
+  "related_dossier_ids": [],
+  "origin": { "engine": "history-engine", "version": "0.1", "created_at": "2026-09-10T03:40:00Z" },
+
+  "acts": [
+    {
+      "act": 1,
+      "title": "The Golden Fleece",
+      "purpose": "Why wool made Australia rich and why the country came to depend on it.",
+      "narration": "In 1951 a single wool clip earned more than the rest of Australia's exports put together. FINISHED NARRATION CONTINUES — this fixture carries a stub; a real dossier carries the full act script here.",
+      "claim_ids": ["c-001", "c-002"],
+      "media_ids": ["af-wool-001-m01", "af-wool-001-m02"]
+    },
+    {
+      "act": 2,
+      "title": "The Floor",
+      "purpose": "The Reserve Price Scheme — what it promised and how it worked.",
+      "narration": "FINISHED NARRATION — stub.",
+      "claim_ids": ["c-003", "c-004"],
+      "media_ids": ["af-wool-001-m03"]
+    },
+    {
+      "act": 3,
+      "title": "The Stockpile",
+      "purpose": "The 1980s escalation and the bales nobody would buy.",
+      "narration": "FINISHED NARRATION — stub.",
+      "claim_ids": ["c-005", "c-006"],
+      "media_ids": ["af-wool-001-m04", "af-wool-001-m05"]
+    },
+    {
+      "act": 4,
+      "title": "The Fall",
+      "purpose": "February 1991: the floor is pulled, and what it did to farms, towns and banks.",
+      "narration": "FINISHED NARRATION — stub.",
+      "claim_ids": ["c-007", "c-008"],
+      "media_ids": ["af-wool-001-m06"]
+    }
+  ],
+
+  "claims": [
+    { "id": "c-001", "text": "In 1950–51 wool accounted for more than half of Australia's export income.", "claim_type": "fact",
+      "source_url": "https://www.abs.gov.au/example/year-book-1953", "source_domain": "abs.gov.au", "source_type": "statistic",
+      "published_at": "1953-01-01", "retrieved_at": "2026-09-10T02:14:00Z", "credibility": 0.95 },
+    { "id": "c-002", "text": "The 1951 wool boom followed US stockpiling during the Korean War.", "claim_type": "interpretation",
+      "source_url": "https://trove.nla.gov.au/example/article/1951", "source_domain": "trove.nla.gov.au", "source_type": "newspaper",
+      "published_at": "1951-03-12", "retrieved_at": "2026-09-10T02:16:00Z", "credibility": 0.8,
+      "attribution": "contemporary reporting in the Sydney Morning Herald" },
+    { "id": "c-003", "text": "The Reserve Price Scheme began operating in 1974.", "claim_type": "fact",
+      "source_url": "https://www.legislation.gov.au/example/wool-industry-act-1974", "source_domain": "legislation.gov.au", "source_type": "filing",
+      "published_at": "1974-01-01", "retrieved_at": "2026-09-10T02:20:00Z", "credibility": 0.97 },
+    { "id": "c-004", "text": "Under the scheme the Australian Wool Corporation bought any wool that failed to reach the floor price at auction.", "claim_type": "fact",
+      "source_url": "https://trove.nla.gov.au/example/article/1975", "source_domain": "trove.nla.gov.au", "source_type": "newspaper",
+      "published_at": "1975-08-02", "retrieved_at": "2026-09-10T02:21:00Z", "credibility": 0.9 },
+    { "id": "c-005", "text": "By early 1991 the stockpile exceeded 4.7 million bales.", "claim_type": "fact",
+      "source_url": "https://trove.nla.gov.au/example/article/1991-stockpile", "source_domain": "trove.nla.gov.au", "source_type": "newspaper",
+      "published_at": "1991-02-12", "retrieved_at": "2026-09-10T02:25:00Z", "credibility": 0.9 },
+    { "id": "c-006", "text": "The 1988 floor-price rise to 870 cents a kilogram was the decisive over-reach.", "claim_type": "disputed",
+      "source_url": "https://example-university.edu.au/example/wool-crash-analysis", "source_domain": "example-university.edu.au", "source_type": "academic",
+      "published_at": "2004-06-01", "retrieved_at": "2026-09-10T02:30:00Z", "credibility": 0.75,
+      "attribution": "economic historians vs. industry figures of the time",
+      "contest": "Industry representatives argued the collapse was driven by the Soviet and Chinese buying slump, not the floor level.",
+      "secondary_source_urls": ["https://trove.nla.gov.au/example/article/1991-industry-response"] },
+    { "id": "c-007", "text": "The Reserve Price Scheme was suspended on 11 February 1991.", "claim_type": "fact",
+      "source_url": "https://trove.nla.gov.au/example/article/1991-02-11", "source_domain": "trove.nla.gov.au", "source_type": "newspaper",
+      "published_at": "1991-02-11", "retrieved_at": "2026-09-10T02:33:00Z", "credibility": 0.95 },
+    { "id": "c-008", "text": "\"We went to bed with a floor under us and woke up with nothing.\"", "claim_type": "eyewitness",
+      "source_url": "https://oralhistory.example.gov.au/example/wool-growers-1992", "source_domain": "oralhistory.example.gov.au", "source_type": "oral_history",
+      "published_at": "1992-05-01", "retrieved_at": "2026-09-10T02:35:00Z", "credibility": 0.8,
+      "attribution": "a Riverina wool grower, recorded 1992" }
+  ],
+
+  "quotes": [
+    { "id": "q-001", "text": "We went to bed with a floor under us and woke up with nothing.", "speaker": "Riverina wool grower (name withheld in the archive)",
+      "source_url": "https://oralhistory.example.gov.au/example/wool-growers-1992", "locator": "00:14:22", "claim_type": "eyewitness", "rights_status": "review" }
+  ],
+
+  "timeline": [
+    { "date": "1951-03-01", "label": "Wool boom peaks", "claim_id": "c-001" },
+    { "date": "1974-01-01", "label": "Reserve Price Scheme begins", "claim_id": "c-003" },
+    { "date": "1988-07-01", "label": "Floor raised to 870c/kg", "claim_id": "c-006" },
+    { "date": "1991-02-11", "label": "Scheme suspended", "claim_id": "c-007" }
+  ],
+
+  "series": [
+    { "name": "stockpile_bales_millions", "unit": "million bales",
+      "points": [["1987", 0.6], ["1988", 1.1], ["1989", 2.3], ["1990", 3.9], ["1991-02", 4.7]], "claim_id": "c-005" }
+  ],
+
+  "media": [
+    { "id": "af-wool-001-m01", "kind": "photo", "provenance": "archival",
+      "source_url": "https://collection.slsa.sa.gov.au/example/B-12345", "source_domain": "collection.slsa.sa.gov.au",
+      "rights_status": "cleared", "licence": "Out of copyright (published before 1955)", "attribution_text": "State Library of South Australia, B 12345",
+      "modification_allowed": true, "rights_evidence_url": "https://collection.slsa.sa.gov.au/example/B-12345/terms", "rights_verified_at": "2026-09-10",
+      "caption": "Shearing shed, Riverina, c.1949" },
+    { "id": "af-wool-001-m02", "kind": "document", "provenance": "archival",
+      "source_url": "https://trove.nla.gov.au/example/newspaper/page/1951", "source_domain": "trove.nla.gov.au",
+      "rights_status": "cleared", "licence": "Out of copyright (published 1951)", "attribution_text": "The Sydney Morning Herald, 12 March 1951, via Trove (National Library of Australia)",
+      "modification_allowed": true, "rights_verified_at": "2026-09-10", "caption": "Front page, 12 March 1951" },
+    { "id": "af-wool-001-m03", "kind": "map", "provenance": "generated",
+      "source_url": "https://files.example.internal/af-wool-001/map-wool-regions.png", "source_domain": "files.example.internal",
+      "rights_status": "cleared", "licence": "Owned — generated for this File", "modification_allowed": true, "rights_verified_at": "2026-09-10",
+      "label": "Illustration", "caption": "Australia's principal wool-growing regions (illustration)" },
+    { "id": "af-wool-001-m04", "kind": "photo", "provenance": "archival",
+      "source_url": "https://collection.example-statelibrary.gov.au/example/stockpile-1990", "source_domain": "collection.example-statelibrary.gov.au",
+      "rights_status": "review", "licence": "Unknown — post-1955 photograph, rights holder not yet identified",
+      "modification_allowed": false, "caption": "Wool store, 1990" },
+    { "id": "af-wool-001-m05", "kind": "chart", "provenance": "generated",
+      "source_url": "https://files.example.internal/af-wool-001/chart-stockpile.png", "source_domain": "files.example.internal",
+      "rights_status": "cleared", "licence": "Owned — rendered from series stockpile_bales_millions", "modification_allowed": true, "rights_verified_at": "2026-09-10",
+      "label": "Chart", "caption": "The stockpile, 1987–1991 (million bales)" },
+    { "id": "af-wool-001-m06", "kind": "document", "provenance": "archival",
+      "source_url": "https://trove.nla.gov.au/example/newspaper/page/1991-02-12", "source_domain": "trove.nla.gov.au",
+      "rights_status": "cleared", "licence": "NLA terms — check per item (post-1955)", "attribution_text": "The Age, 12 February 1991, via Trove (National Library of Australia)",
+      "modification_allowed": false, "rights_evidence_url": "https://trove.nla.gov.au/example/terms", "rights_verified_at": "2026-09-10",
+      "caption": "Front page, 12 February 1991" }
+  ],
+
+  "milestones": [
+    { "text": "Publish the paired supporting article on the Reserve Price Scheme with full citations.", "due": "2026-10-31" },
+    { "text": "Six-month check: viewer questions and corrections folded into the File; any disputed claim re-examined.", "due": "2027-03-10", "claim_id": "c-006" },
+    { "text": "Open File 002 (Gold) with a cross-link from White Gold's regional-Australia thread.", "due": "2027-03-10" }
+  ]
+}
