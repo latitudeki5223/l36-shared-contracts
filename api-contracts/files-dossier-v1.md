@@ -150,7 +150,7 @@ Validation (`400`) is shape. Gates (`422`) are editorial rules from the brand's 
 | sourcing | every numeral / % / $ amount / 4-digit year / quoted span in narration is covered by a referenced claim; an `interpretation` is attributed in the narration; `disputed` carries ≥ 2 sources and a contest | `422` listing each uncovered atom |
 | provenance | a `generated` item is never captioned/labelled as archival; every `generated` item has a `label`; every `archival` item resolves to a registry domain with attribution satisfied | `422` per item |
 | rights | any media with `rights_status ∈ {review, unknown, rejected}` referenced by an act | `422` — the dossier is stored, the episode is **not** queued |
-| claims (Business Files only) | narration contains no price target, buy/sell/hold, recommendation or guaranteed-return wording | `422` |
+| claims (New CEO Files only) | narration contains no price target, buy/sell/hold, recommendation or guaranteed-return wording | `422` |
 
 Gates run again at the publish funnel on L36; passing on receipt does not bypass them later.
 
