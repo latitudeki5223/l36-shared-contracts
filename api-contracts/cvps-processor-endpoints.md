@@ -5,7 +5,7 @@ Last Updated: 2026-05-02
 
 ## Overview
 
-The CVPS Service exposes **58 endpoints** across 6 blueprints. The "33 endpoints" figure from v4.2 was correct at extraction but drifted as recipes, reviews, digital products, and other features were added without contract updates. This document is the authoritative count and is enforced by `scripts/validators/check-component-contract.sh`.
+The CVPS Service exposes **59 endpoints** across 6 blueprints. The "33 endpoints" figure from v4.2 was correct at extraction but drifted as recipes, reviews, digital products, and other features were added without contract updates. This document is the authoritative count and is enforced by `scripts/validators/check-component-contract.sh`.
 
 > ℹ️ **Endpoints vs component types — do not conflate.** This doc counts **HTTP endpoints (58)**. `COMPONENT_CONTRACT.md` counts **UI section/component types (33)** — a different thing. A "33" you see elsewhere is almost always the component types, not endpoints.
 
@@ -13,13 +13,13 @@ The CVPS Service exposes **58 endpoints** across 6 blueprints. The "33 endpoints
 
 | Blueprint | File | Routes |
 |---|---|---|
-| `cvps_bp` | `app/routes/cvps_routes.py` | 33 |
+| `cvps_bp` | `app/routes/cvps_routes.py` | 34 |
 | `recipe_bp` | `app/routes/recipe_routes.py` | 11 |
 | `review_bp` | `app/routes/review_routes.py` | 5 |
 | `wholesale_bp` | `app/routes/wholesale_routes.py` | 4 |
 | `digital_products_bp` | `app/routes/digital_product_routes.py` | 3 |
 | `health_bp` | `app/routes/health_routes.py` | 2 |
-| **Total** | | **58** |
+| **Total** | | **59** |
 
 ### Architectural Context (November 2025)
 **CRITICAL**: CVPS is a **standalone microservice** (extracted from backend on Nov 9, 2025)
@@ -413,6 +413,45 @@ GET /products/{id}
 GET /products/slug/{slug}
 ```
 
+**Response** (also returned by `GET /products/{id}`):
+```json
+{
+  "success": true,
+  "product": { "...": "full product" },
+  "relatedProducts": [
+    {
+      "id": 30,
+      "name": "Almond Dukkah",
+      "slug": "almond-dukkah-80gm",
+      "imageUrl": "https://media.latitude36.com.au/...",
+      "price": { "website": 12.50 }
+    }
+  ]
+}
+```
+
+`relatedProducts` — up to 4 products drawn from the `product_backlinks` graph
+for this context, falling back to same-category siblings so the storefront's
+"You May Also Like" strip is never empty. Cards are the same shape the product
+list returns, so the storefront renders them through its existing product grid.
+Slugs are the LIVE storefront slug (size suffix included), never the raw
+`products.slug` column. This is a fixed block on the hardcoded `/product/[slug]`
+route — NOT a registered Component Contract section type.
+
+### 12a. Related Products ⭐ NEW
+```http
+GET /related-products/{product_id}?limit=4
+```
+
+Public read. Same feed as the `relatedProducts` field above, for callers that
+already have a product id. `limit` defaults to 4 and is capped at 12. Returns
+404 (not an empty list) when the product is not visible in the requested
+context. Cached 30 minutes.
+
+```json
+{ "success": true, "products": [ { "id": 30, "name": "Almond Dukkah", "slug": "almond-dukkah-80gm" } ] }
+```
+
 ### 13. Blog Post by ID
 ```http
 GET /blog/{id}
@@ -798,6 +837,13 @@ Products include comprehensive tagging data:
 - Individual items: Complete data in single request
 
 ## Version History
+
+### Version 4.4 (2026-09-21)
+- ✅ Added `GET /related-products/{product_id}` — the `product_backlinks` graph
+  as storefront-ready product cards (issue #2795)
+- ✅ `GET /products/{id}` and `GET /products/slug/{slug}` now return
+  `relatedProducts`, which the storefront's "You May Also Like" strip renders
+- ✅ Total endpoints 58 → 59 (`cvps_bp` 33 → 34)
 
 ### Version 4.1 (2025-10-06, Updated 2025-10-17)
 - 🔴 **BREAKING**: Removed API key requirement for public endpoints
