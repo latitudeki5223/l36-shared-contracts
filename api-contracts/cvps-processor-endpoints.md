@@ -1,11 +1,11 @@
 # CVPS Service API Endpoints Specification
 
-Version: 5.0 - Post-Drift Resync
-Last Updated: 2026-05-02
+Version: 5.1 - Drift Resync + resolve-context
+Last Updated: 2026-10-20
 
 ## Overview
 
-The CVPS Service exposes **58 endpoints** across 6 blueprints. The "33 endpoints" figure from v4.2 was correct at extraction but drifted as recipes, reviews, digital products, and other features were added without contract updates. This document is the authoritative count and is enforced by `scripts/validators/check-component-contract.sh`.
+The CVPS Service exposes **60 endpoints** across 7 blueprints. The "33 endpoints" figure from v4.2 was correct at extraction but drifted as recipes, reviews, digital products, and the Host→context resolver were added without contract updates. This document is the authoritative count and is enforced by `scripts/validators/check-component-contract.sh` (which compares the live route count, not the component contract — see its header).
 
 > ℹ️ **Endpoints vs component types — do not conflate.** This doc counts **HTTP endpoints (58)**. `COMPONENT_CONTRACT.md` counts **UI section/component types (33)** — a different thing. A "33" you see elsewhere is almost always the component types, not endpoints.
 
@@ -13,13 +13,14 @@ The CVPS Service exposes **58 endpoints** across 6 blueprints. The "33 endpoints
 
 | Blueprint | File | Routes |
 |---|---|---|
-| `cvps_bp` | `app/routes/cvps_routes.py` | 33 |
+| `cvps_bp` | `app/routes/cvps_routes.py` | 34 |
 | `recipe_bp` | `app/routes/recipe_routes.py` | 11 |
 | `review_bp` | `app/routes/review_routes.py` | 5 |
 | `wholesale_bp` | `app/routes/wholesale_routes.py` | 4 |
 | `digital_products_bp` | `app/routes/digital_product_routes.py` | 3 |
 | `health_bp` | `app/routes/health_routes.py` | 2 |
-| **Total** | | **58** |
+| `resolve_bp` | `app/routes/resolve_routes.py` | 1 |
+| **Total** | | **60** |
 
 ### Architectural Context (November 2025)
 **CRITICAL**: CVPS is a **standalone microservice** (extracted from backend on Nov 9, 2025)
@@ -29,14 +30,15 @@ The CVPS Service exposes **58 endpoints** across 6 blueprints. The "33 endpoints
 - **Routing**: Traefik routes `/api/cvps/*` to cvps-service
 
 ### Version history
-- **v5.0 (May 2026)** — drift resync to 58 endpoints; contract validator wired into pre-commit
+- **v5.1 (Oct 2026)** — resync to 60 endpoints; added `resolve_bp` (resolve-context) + related-products; context precedence documented
+- **v5.0 (May 2026)** — drift resync to 60-ish endpoints; contract validator wired into pre-commit
 - **v4.2 (Nov 2025)** — claimed 33 endpoints; recipe/review/digital-product blueprints added without contract update
-- **v4.1 (Oct 2025)** — 24 endpoints (20 public + 4 wholesale) before extraction
+- **v4.1 (Oct 2025)** — 24 endpoints pre-extraction (4 of them wholesale)
 
 ## Authentication
 
 ### Public Endpoints (No Authentication Required)
-The following 29 endpoints are completely public and require NO authentication headers:
+The 56 non-wholesale endpoints are public and require NO authentication headers:
 - All content endpoints (homepage, products, blog, etc.)
 - Shipping information
 - Business information
@@ -67,7 +69,7 @@ Where `{BASE_URL}` is the environment-specific MVPS domain:
 
 ## Multi-Tenant Support 🆕
 
-**Status**: ✅ **COMPLETE for Public Routes** (20/20), ⚠️ **IN PROGRESS for Wholesale Routes** (0/4)
+**Status**: ✅ **COMPLETE for Public Routes**, ⚠️ **IN PROGRESS for Wholesale Routes** (JWT extraction pending)
 
 All CVPS public endpoints fully support multi-tenant isolation via the `context_id` parameter:
 
@@ -77,32 +79,28 @@ GET /api/cvps/homepage?context_id=2
 GET /api/cvps/categories?context_id=3
 ```
 
-### Context ID Parameter
+### Context ID resolution (precedence)
 
-**Parameter**: `context_id` (optional query parameter)
-- **Type**: Integer
-- **Default**: 1 (Latitude36)
-- **Range**: 1 to N (where N = number of active contexts)
-- **Purpose**: Isolates data to specific website/brand
+`context_id` is resolved per request by `get_context_from_request()`
+(`cvps-service/app/utils/context_helpers.py`) in this order — **first match wins**:
+
+1. **`X-Context-ID` header** (sent by the frontend apiClient) — preferred
+2. **`?context_id=` query parameter**
+3. **`context_id` in the JSON body** (POST/PUT/PATCH only)
+4. **Default `1`** (Latitude36) — when a route treats context as optional. This
+   fallback is silent; callers that need a specific tenant must send one of 1–3.
+
+- **Type**: Integer · **Range**: 1 to N active contexts · **Purpose**: isolates data to a website/brand.
 
 ### Usage
 
-**Frontend Detection** (Recommended):
+**Frontend Detection** (Recommended) — runtime resolver, not a build-time map:
 ```javascript
-// Domain-based context detection
-const getContextId = () => {
-  const hostname = window.location.hostname;
-  const SITE_CONFIG = {
-    'staging.latitude36.com.au': 1,
-    'dropship.example.com': 2,
-    'directory.example.com': 3
-  };
-  return SITE_CONFIG[hostname] || 1;
-};
-
-// Add to all API calls
-const contextId = getContextId();
-fetch(`${API_URL}/api/cvps/products?context_id=${contextId}`);
+// storefront lib/domain-config.ts: STATIC_MAP first, then the runtime resolver,
+// then fall back to context 1. See the resolve-context endpoint below.
+const res = await fetch(`${API_URL}/api/cvps/resolve-context?host=${location.hostname}`);
+const contextId = res.ok ? (await res.json()).context_id : 1;
+fetch(`${API_URL}/api/cvps/products`, { headers: { 'X-Context-ID': String(contextId) } });
 ```
 
 **Manual Override** (Testing/Admin):
@@ -141,16 +139,16 @@ GET /api/cvps/products?context_id=2  → Returns 0 products (different site)
 - Performance indexes on all context_id columns (117 indexes)
 - FK constraints for referential integrity (112 constraints)
 - All existing data backfilled to context_id=1 (2,694 rows)
-- **Public CVPS routes** - All 20 public endpoints support context_id
+- **Public CVPS routes** - All public endpoints support context_id
 - **Backend aggregators** - All public aggregators context-aware
+- **Frontend domain detection** - LIVE via `GET /api/cvps/resolve-context?host=` (replaces the build-time `DOMAIN_MAP`; storefront `lib/domain-config.ts` checks a `STATIC_MAP`, then this resolver against active `business_contexts.domain`, then falls back to context 1)
 
 **🟡 In Progress**:
 - **Wholesale CVPS routes** - Context_id extraction from JWT pending
 - MVPS management routes (Phase 3)
 
 **⏳ Pending**:
-- Frontend domain detection (Phase 4)
-- Traefik multi-domain routing (Phase 5)
+- Traefik multi-domain routing — a DB-registered domain resolves with no storefront rebuild, but the storefront box still needs a per-domain Traefik `Host()` label
 
 ### Business Contexts Registry
 
@@ -205,7 +203,34 @@ All endpoints implement intelligent caching with appropriate TTLs:
 - **Shipping**: 24 hours
 - **Business Info**: 24 hours
 
-## Public Content Endpoints (20)
+## Context Resolution Endpoint (1)
+
+### Resolve host → context
+```http
+GET /api/cvps/resolve-context?host=<hostname>
+```
+The keystone of dynamic domain routing (`cvps-service/app/routes/resolve_routes.py`).
+The storefront calls this at runtime to map a request's `Host` header to a tenant,
+replacing the old build-time `DOMAIN_MAP`. Port / `www.` are tolerated; path-based
+pseudo-domains in `business_contexts.domain` (e.g. `.../kk`) are never matched
+(host-only by design). 60s cache.
+
+- **200** `{context_id, business_name, domain}` — matched an active context
+- **404** `{error, host}` — unknown host (storefront renders a real not-found)
+- **400** `{error}` — missing/invalid `host`
+
+A DB-registered active domain resolves here with **no storefront rebuild** (the box
+still needs a Traefik `Host()` label for TLS routing).
+
+## Public Content Endpoints
+
+### Related products feed
+```http
+GET /api/cvps/related-products/<product_id>?context_id=<id>&limit=<n>
+```
+Products related to a given product, drawn from the `product_backlinks` graph
+(`cvps-service/app/routes/cvps_routes.py`, `related_products_service`). Context-scoped;
+30-minute cache keyed on product + context + limit. Returns `{relatedProducts: [...]}`.
 
 ### 1. Health Check
 ```http
@@ -782,7 +807,7 @@ Products include comprehensive tagging data:
 - ✅ Added site configuration endpoint (`/site-config`) - NEW
 - ✅ Added address validation endpoint (`/address/validate`)
 - ✅ Added wholesale module with 4 B2B endpoints
-- ✅ Total endpoints increased to 24 (20 public + 4 wholesale)
+- ✅ Total endpoints increased to 24 at the time (4 of them wholesale)
 - ✅ Implemented JWT authentication for wholesale endpoints only
 - ✅ Full multi-tenant support for all public endpoints
 - ⚠️ Multi-tenant support for wholesale endpoints (query param, JWT pending)
@@ -811,7 +836,7 @@ Products include comprehensive tagging data:
 ---
 
 **Generated by**: MVPS-CVPS Management Agent
-**Documentation Status**: ✅ CURRENT - Version 4.1 fully operational
-**Last Updated**: 2025-10-17 (Multi-tenant updates)
-**Last Validation**: 2025-10-17 08:00:00 UTC
-**Total Endpoints**: 24 (20 public + 4 wholesale)
+**Documentation Status**: ✅ CURRENT - Version 5.1 (drift resync + resolve-context)
+**Last Updated**: 2026-10-20 (#3523 truth resync)
+**Last Validation**: 2026-10-20
+**Total Endpoints**: 60 (56 non-wholesale + 4 wholesale)
