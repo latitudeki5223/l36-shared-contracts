@@ -181,6 +181,33 @@ POST /api/paypal/webhook
 }
 ```
 
+## Checkout and refund refusals (live routes, epic checkout-money-correctness #5850)
+
+The storefront checkout routes are `POST /api/cms/commerce/create-checkout-session` (Stripe) and
+`POST /api/cms/commerce/create-paypal-order` (PayPal). A refusal creates **no order and no payment
+session**, and the discount code's `times_used` is not raised.
+
+| Status | Body | When |
+|--------|------|------|
+| 400 | `{"error": "Sorry, we currently only ship within Australia."}` | Shipping country is not Australia (a blank country counts as Australia) |
+| 400 | `{"success": false, "error": "<code message>"}` | Discount code not found, expired, used up or under its minimum spend |
+| 400 | `{"success": false, "error": "Order total is below the card minimum of $0.50."}` | Stripe only: card total $0.01–$0.49 |
+| 500 | `{"success": false, "error": "Card total did not match the order — no payment was taken"}` | Stripe only: the cents built for Stripe (line items − coupon) differ from the order total. Kitchen-slip label `amount_mismatch` |
+| 503 | `{"success": false, "error": "Shipping is not available for this store yet."}` | The store has no flat shipping rate in context config. Kitchen-slip label `shipping_not_configured` |
+
+- The shipping price is always the store's `site_branding.shipping_flat_rate_price`. A `shipping_cost`
+  in the request is ignored.
+- `GET /api/shipping/quote` answers 503 `{"success": false, "error": "shipping_not_configured"}` for a store
+  with no rate.
+
+**Refunds** — `POST /api/cms/commerce/orders/<id>/refund` (admin): a Stripe refund larger than what the
+PaymentIntent received, less what is already refunded, is refused **before** Stripe is called:
+400 `{"error": "refund_exceeds_amount_received"}`. An unreadable PaymentIntent is refused the same way.
+
+**After payment** — the Stripe webhook compares `amount_total` with the order. A difference is recorded
+on the order (`system_flags.stripe_amount_check`, `needs_attention`) and alerts the owner once. The order
+still fulfils, and the webhook still answers 200.
+
 ## Error Codes
 
 | Code | Description |

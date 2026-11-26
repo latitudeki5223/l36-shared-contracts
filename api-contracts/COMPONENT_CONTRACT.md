@@ -1,6 +1,6 @@
 # MVPS → CVPS Component Contract
 
-**Version**: 1.2
+**Version**: 1.6
 **Created**: 2026-03-27
 **Purpose**: Rules for creating new section types that CVPS can render
 
@@ -308,7 +308,7 @@ CVPS = The Window (displays it)
 
 See `frontend-nextjs/components/section-config/registry.tsx` for the full list.
 
-### Universal (33 components)
+### Universal (36 components)
 - `header`, `footer`
 - `hero`, `text`, `mission`, `story`, `brand_story`
 - `newsletter`, `contact_form`, `cta`, `stats`, `logo_cloud`
@@ -322,7 +322,22 @@ See `frontend-nextjs/components/section-config/registry.tsx` for the full list.
 - `custom_html`, `donation_form`, `live_chat`
 - `gateway_hero`, `category_portals`, `homepage_newsletter`
 
-### Newspaper world (22 components — Latitude 36 1950s second site)
+---
+
+## Pending — NOT deployed on the storefront (MVPS must not send these)
+
+> **These types are NOT registered in the live storefront.** `SECTION_RENDERERS` in
+> prod `frontend-nextjs/components/section-config/registry.tsx` contains **none** of the
+> 22 `newspaper_*` types, and `components/sections/newspaper/` does not exist there. A page
+> that sends any of them renders **"Section Type Not Registered"**.
+>
+> Owner decision 2026-10-20 (issue #3521), **option 2 — PULL**: the newspaper spec stays
+> documented here, but it is **pending deployment**. **MVPS must not send a `newspaper_*`
+> type** until the storefront ships these components; at that point they move back up under
+> *Currently Registered Components*. Nothing in MVPS enforces this at publish time today — it
+> is an operator contract, not a code gate.
+
+### Newspaper world — PENDING (22 components — Latitude 36 1950s second site)
 
 Rendered by `frontend-nextjs/components/sections/newspaper/` inside `NewspaperShell`
 (the printed sheet). Pages whose sections start with `newspaper_` render chrome-free
@@ -381,3 +396,4 @@ gains `variant: band|page`; nav carries a working search into `/shop?search=`.
 | 1.3 | 2026-07-05 | Added newspaper world family (16 `newspaper_*` components) for the Latitude 36 1950s second site — 49 total |
 | 1.4 | 2026-07-05 | Newspaper v2 old-school restyle: +`newspaper_icon_strip`, `newspaper_category_row`, `newspaper_feature_band`, `newspaper_newsletter` (20 newspaper / 53 total); aged tattered sheet, colour product cards, poster ads |
 | 1.5 | 2026-07-05 | Newspaper detail pass to the reference sheet: +`newspaper_shipping_strip`, `newspaper_promo_row` (22 newspaper / 55 total); lead-story spotlight-product variant + display column; tan paper, Ultra masthead, category view-all tile, footer photo column |
+| 1.6 | 2026-10-20 | Contract-vs-registry reconcile (#3521, owner option 2 — PULL). Universal count corrected 33→36 (`gateway_hero`, `category_portals`, `homepage_newsletter` were already in the live registry; the heading undercounted). The 22 `newspaper_*` types moved under **"Pending — NOT deployed on the storefront"** — the live storefront registry holds none of them, so MVPS must not send them. Counts now consistent: **36 registered + 22 pending** (58 total). |
